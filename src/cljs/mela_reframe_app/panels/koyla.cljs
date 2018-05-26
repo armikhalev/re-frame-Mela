@@ -4,6 +4,11 @@
 (defn search-field []
   [:input {:on-change #(re-frame/dispatch [:search-input-entered (-> % .-target .-value)])}])
 
+(defn find-word [word dict]
+  (filter
+   #(re-find (re-pattern word) (:word %))
+   dict))
+
 (defn koyla-panel []
   [:div "Se ya Koyla pagi"
    [:div [:a {:href "#/"} "go to Home Page"]]
@@ -11,4 +16,10 @@
    (let [koyla (re-frame/subscribe [::subs/words])
          cur-input (re-frame/subscribe [::subs/search-input])]
      [:p "Looking for: "]
-     [:div ((fn [word dict] (filter #(re-find (re-pattern word) (:word %) ) dict)) @cur-input @koyla)])])
+     (let [{:keys [word la comment]} (first (find-word @cur-input @koyla))]
+        [:div
+         [:div "English: " word]
+         [:div "Mela: " la]
+         [:div "Comment: " comment]
+         [:div (str @koyla)]])
+     )])
