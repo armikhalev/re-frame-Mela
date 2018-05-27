@@ -23,11 +23,13 @@
   (defroute "/" []
     (re-frame/dispatch [::events/set-active-panel :home-panel]))
 
-  (defroute "/about" []
-    (re-frame/dispatch [::events/set-active-panel :about-panel]))
+  (defroute "/latay" []
+    (re-frame/dispatch [::events/set-active-panel :latay-panel]))
 
   (defroute "/koyla" []
     (re-frame/dispatch [::events/set-active-panel :koyla-panel]))
 
+  (defroute "/textbook" []
+    (re-frame/dispatch [::events/set-active-panel :textbook-panel]))
   ;; --------------------
   (hook-browser-navigation!))

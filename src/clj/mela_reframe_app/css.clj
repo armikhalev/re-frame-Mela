@@ -2,5 +2,8 @@
   (:require [garden.def :refer [defstyles]]))
 
 (defstyles screen
-  [:body {:color "red"}]
-)
+  [:nav {:margin-bottom 23}
+   [:ul {:display "flex"
+         :justify-content "space-around"
+         :list-style "none"}
+    [:a {:text-decoration "none"}]]])

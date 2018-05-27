@@ -10,8 +10,7 @@
    dict))
 
 (defn koyla-panel []
-  [:div "Se ya Koyla pagi"
-   [:div [:a {:href "#/"} "go to Home Page"]]
+  [:div 
    [ search-field ]
    (let [koyla (re-frame/subscribe [::subs/words])
          cur-input (re-frame/subscribe [::subs/search-input])]
@@ -21,5 +20,5 @@
          [:div "English: " word]
          [:div "Mela: " la]
          [:div "Comment: " comment]
-         [:div (str @koyla)]])
+         #_[:div (str @koyla)]])
      )])
