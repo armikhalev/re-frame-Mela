@@ -33,13 +33,13 @@
 (defn show-panel [panel-name]
   [:div.app
    [:header
-    [:nav
+    [:nav.navbar-nav
      [:ul
       [:li [:a {:href "#/"} "Home"]]
       [:li [:a {:href "#/latay"} "Basic Words"]]
       [:li [:a {:href "#/koyla"} "Koyla"]]
       [:li [:a {:href "#/textbook"} "Textbook"]]]]]
-   [:main
+   [:main.main-container
     [panels panel-name]]])
 
 (defn main-panel []

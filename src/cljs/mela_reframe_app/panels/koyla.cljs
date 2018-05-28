@@ -9,15 +9,21 @@
    #(re-find (re-pattern word) (:word %))
    dict))
 
+(defn card-comp []
+  (let []
+      (fn [{:keys [word la comment]}]
+        [:ul.koyla-result-ul
+         ^{:key (:id word)} 
+         [:li "English: " word]
+         [:li "Mela: " la]
+         [:li "Comment: " comment]]
+        #_[:div (str @koyla)])))
+
 (defn koyla-panel []
   [:div 
    [ search-field ]
    (let [koyla (re-frame/subscribe [::subs/words])
          cur-input (re-frame/subscribe [::subs/search-input])]
-     (let [{:keys [word la comment]} (first (find-word @cur-input @koyla))]
-        [:div.word-results-row
-         [:div "English: " word]
-         [:div "Mela: " la]
-         [:div "Comment: " comment]
-         #_[:div (str @koyla)]])
-     )])
+        [:div
+         (for [card (find-word @cur-input @koyla)]
+           [card-comp card])])])
