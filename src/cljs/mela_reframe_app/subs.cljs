@@ -20,3 +20,8 @@
  ::words
  (fn [db _]
    (:words db)))
+
+(re-frame/reg-sub
+ ::first-letters
+ (fn [db _]
+   (:first-letters db)))
