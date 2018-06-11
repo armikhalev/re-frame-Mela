@@ -1,6 +1,7 @@
 (ns mela-reframe-app.events
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.db :as db]
+            [cljs.spec.alpha :as spec]
             [mela-reframe-app.subs :as subs]
             [ajax.core :as ajax]
             [day8.re-frame.http-fx]
@@ -26,11 +27,12 @@
               (let [trim-fn (fn [event] (-> event rest vec))]
                 (update-in context [:coeffects :event] trim-fn)))))
 
+;; TODO: limit words to some number
 (reg-event-db
  :process-response
  [trim-event]
  (fn [db [response]]           ;; destructure the response from the event vector
-   (assoc db :words
+   (update-in db [:words] into
           (reduce
            (fn [acc data]
              (conj acc
@@ -79,18 +81,17 @@
 
 (defn handle-search-input-entered
   [{:keys [db]} [_ word]]
-  {:db (assoc-in db [:search-input] word)
-   :dispatch [:request-words "words" word]}
-  #_(if (and (= 1 (count word))
+  (if (and (= 1 (count word))
            (not (some #(= word %) (:first-letters db))))
     ;; true
     {:db (assoc-in db [:search-input] word)
-     :dispatch [:request-words "words" word]}
+     :dispatch [:request-words "words" word]
+     :set-first-letters word}
     ;; else
     {:db (assoc-in db [:search-input] word)})
   )
 
 (re-frame/reg-event-fx
  :search-input-entered
- [(inject-cofx :set-first-letters)]
+ ;; [(inject-cofx :set-first-letters)]
  handle-search-input-entered)
