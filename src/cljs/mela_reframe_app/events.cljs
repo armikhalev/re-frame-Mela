@@ -62,23 +62,6 @@
                  :on-success      [:process-response]
                  :on-failure      [:bad-response]}}))
 
-;; (reg-event-fx
-;;  :request-words-starting-with
-;;  (fn [{db :db} [_ lang word]]
-;;    (when (#(not= word %) (:first-letters db))
-;;      (get-words lang word)
-;;      (prn "request-words-starting-with handler" lang word) )))
-
-;; search input handler funcs
-#_(if (= 1 (count word))
-  (when
-      (#(not= word %) (:first-letters db))
-    (do
-      (prn (:first-letters db))
-      (let [fl-db (update-in db [:first-letters] conj word)]
-        (prn fl-db)
-        {:db (assoc-in fl-db [:search-input] word)}))))
-
 (defn handle-search-input-entered
   [{:keys [db]} [_ word]]
   (if (and (= 1 (count word))
@@ -93,5 +76,4 @@
 
 (re-frame/reg-event-fx
  :search-input-entered
- ;; [(inject-cofx :set-first-letters)]
  handle-search-input-entered)

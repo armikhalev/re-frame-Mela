@@ -5,7 +5,7 @@
 (defn search-field []
   [:input.word-filter-input
    {:on-change
-    #(re-frame/dispatch [:search-input-entered (-> % .-target .-value)])}])
+    #(re-frame/dispatch [:search-input-entered (-> % .-target .-value)])}]) ;; side-effect TODO: figure out a pure way
 
 (defn find-word [word dict]
   (filter
@@ -20,13 +20,11 @@
          [:li "Mela: " la]
          [:li "Comment: " comment]])))
 
-(defn koyla-panel []
+(defn koyla-panel [koyla cur-input]
   [:div
    [ search-field ]
-   (let [koyla (re-frame/subscribe [::subs/words])
-         cur-input (re-frame/subscribe [::subs/search-input])]
-        [:div.word-results-row
-         (for [card (find-word @cur-input @koyla)]
-           ^{:key (str (:word card)-(random-uuid))}
-           [card-comp card])])])
+   [:div.word-results-row
+    (for [card (find-word cur-input koyla)]
+      ^{:key (str (:word card)-(random-uuid))} ;; random-uuid technically impure but it is worth the simplicity
+      [card-comp card])]])
 

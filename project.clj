@@ -28,7 +28,7 @@
                      :compiler     {:output-to     "resources/public/css/screen.css"
                                     :pretty-print? true}}]}
 
-  :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+  :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
 
   :aliases {"dev" ["do" "clean"
                         ["pdo" ["figwheel" "dev"]
@@ -42,7 +42,7 @@
   {:dev
    {:dependencies [[binaryage/devtools "0.9.10"]
                    [figwheel-sidecar "0.5.16"]
-                   [cider/piggieback "0.2.3"]]
+                   [cider/piggieback "0.3.1"]]
 
     :plugins      [[lein-figwheel "0.5.16"]
                    [lein-doo "0.1.8"]

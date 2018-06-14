@@ -21,12 +21,14 @@
   [:div "This is the Textbook Page."])
 
 ;; main
-
+;; Keep all impurity here, all other views should be pure functions
 (defn- panels [panel-name]
   (case panel-name
     :home-panel [home-panel]
     :latay-panel [latay-panel]
-    :koyla-panel [koyla-panel]
+    :koyla-panel [koyla-panel
+                  @(re-frame/subscribe [::subs/words])
+                  @(re-frame/subscribe [::subs/search-input])]
     :textbook-panel [textbook-panel]
     [:div]))
 
