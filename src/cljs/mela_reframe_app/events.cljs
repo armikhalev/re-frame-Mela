@@ -6,7 +6,17 @@
             [ajax.core :as ajax]
             [day8.re-frame.http-fx]
             [cljs.pprint :as pp]
+            [clojure.spec.alpha :as spec]
             [re-frame.core :refer [reg-event-db reg-event-fx inject-cofx]]))
+
+;; (defn check-and-throw
+;;   "Throws an exception if `db` doesn't match the Spec `a-spec`."
+;;   [a-spec db]
+;;   (when-not (spec/valid? a-spec db)
+;;     (throw (ex-info (str "spec check failed: " (spec/explain-str a-spec db)) {}))))
+
+;; ;; now we create an interceptor using `after`
+;; (def check-spec-interceptor (re-frame/after (partial check-and-throw ::db/db)))
 
 (re-frame/reg-event-db
  ::initialize-db
