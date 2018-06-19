@@ -1,22 +1,16 @@
 (ns mela-reframe-app.events
   (:require [re-frame.core :as re-frame]
-            [mela-reframe-app.db :as db]
+            [mela-reframe-app.db :as db :refer [spec-it]]
             [cljs.spec.alpha :as spec]
             [mela-reframe-app.subs :as subs]
             [ajax.core :as ajax]
             [day8.re-frame.http-fx]
             [cljs.pprint :as pp]
-            [clojure.spec.alpha :as spec]
             [re-frame.core :refer [reg-event-db reg-event-fx inject-cofx]]))
 
-;; (defn check-and-throw
-;;   "Throws an exception if `db` doesn't match the Spec `a-spec`."
-;;   [a-spec db]
-;;   (when-not (spec/valid? a-spec db)
-;;     (throw (ex-info (str "spec check failed: " (spec/explain-str a-spec db)) {}))))
 
-;; ;; now we create an interceptor using `after`
-;; (def check-spec-interceptor (re-frame/after (partial check-and-throw ::db/db)))
+;; now we create an interceptor using `after`
+(def check-spec-interceptor (re-frame/after (partial spec-it ::db/db)))
 
 (re-frame/reg-event-db
  ::initialize-db
@@ -40,7 +34,8 @@
 ;; TODO: limit words to some number
 (reg-event-db
  :process-response
- [trim-event]
+ [check-spec-interceptor
+  trim-event]
  (fn [db [response]]           ;; destructure the response from the event vector
    (update-in db [:words] into
           (reduce

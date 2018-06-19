@@ -1,6 +1,7 @@
 (ns mela-reframe-app.db
   (:require [re-frame.core :as re-frame]
             [clojure.spec.alpha :as spec]
+            [mela-reframe-app.subs :as subs]
             [cljs.pprint :as pp]))
 
 ;; DB
@@ -30,8 +31,17 @@
 (re-frame/reg-fx
  :set-first-letters
  (fn [letter]
-   (swap! re-frame.db/app-db update-in [:first-letters] conj letter)))
-
+   "Ensures that db is not overloaded by checking that words count is less than 1000"
+   "Watches count of first-letters to prevent unnesassary calls to server"
+   "Empties words and first-letters if overloaded"
+   (if (< (count @(re-frame/subscribe [::subs/words])) 1000 )
+     ;;true
+     (swap! re-frame.db/app-db update-in [:first-letters] conj letter)
+     ;;false
+     (do
+       (swap! re-frame.db/app-db update-in [:first-letters] empty)
+       (swap! re-frame.db/app-db update-in [:words] empty)
+))))
 ;; Specs
 
 (spec/def ::word string?)
