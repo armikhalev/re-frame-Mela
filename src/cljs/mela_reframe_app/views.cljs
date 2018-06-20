@@ -1,14 +1,14 @@
 (ns mela-reframe-app.views
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.panels.koyla :refer [koyla-panel]]
-            [mela-reframe-app.subs :as subs]
+            [mela-reframe-app.subs :as subs :refer [<sub]]
             ))
 
 
 ;; home
 (defn home-panel []
-  (let [name (re-frame/subscribe [::subs/name])]
-    [:div (str "Hello from " @name ". This is the Home Page.")]))
+  (let [name "Home"]
+    [:div (str "Hello from " name ". This is the Home Page.")]))
 
 
 ;; latay
@@ -27,8 +27,10 @@
     :home-panel [home-panel]
     :latay-panel [latay-panel]
     :koyla-panel [koyla-panel
-                  @(re-frame/subscribe [::subs/words])
-                  @(re-frame/subscribe [::subs/search-input])]
+                  (<sub [::subs/words])
+                  (<sub [::subs/search-input])
+                  (<sub [::subs/cur-lang])
+                  (<sub [::subs/target-lang])]
     :textbook-panel [textbook-panel]
     [:div]))
 
@@ -45,5 +47,4 @@
     [panels panel-name]]])
 
 (defn main-panel []
-  (let [active-panel (re-frame/subscribe [::subs/active-panel])]
-    [show-panel @active-panel]))
+    [show-panel (<sub [::subs/active-panel])])

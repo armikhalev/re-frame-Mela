@@ -5,11 +5,10 @@
             [cljs.pprint :as pp]))
 
 ;; DB
-
 (def default-db
-  {:name          "re-frame",
-   :words         [],
+  {:words         [],
    :first-letters [],
+   :cur-lang "English"
    :search-input  ""})
 
 ;; coeffects and effects

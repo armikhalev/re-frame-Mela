@@ -2,7 +2,7 @@
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.db :as db :refer [spec-it]]
             [clojure.spec.alpha :as spec]
-            [mela-reframe-app.subs :as subs]))
+            [mela-reframe-app.subs :as subs :refer [>dis]]))
 
 ;; (def check-spec-interceptor (re-frame/after (partial check-and-throw :re-frame.db/app-db)))
 
@@ -11,7 +11,7 @@
 (defn search-field []
   [:input.word-filter-input
    {:on-change
-    #(re-frame/dispatch [:search-input-entered (-> % .-target .-value)])}]) ;; side-effect TODO: figure out a pure way
+    #(>dis [:search-input-entered (-> % .-target .-value)])}]) ;; side-effect TODO: figure out a pure way
 
 (defn find-word [word dict]
   "Takes 'word' string and 'words' vector of maps that should contain :word key with string."
@@ -30,12 +30,17 @@
    [:li "Mela: " la]
    [:li "Comment: " comment]])
 
-(defn koyla-panel [koyla cur-input]
+(defn koyla-panel [koyla cur-input cur-lang target-lang]
   [:div
+   [:label.koyla-source-label cur-lang]
    [ search-field ]
+   [:label.koyla-target-label target-lang]
+   ;; Finish writing button function
+   [:button.koyla-change-button (str "Change to " target-lang)]
    [:div.word-results-row
     (for [card (find-word cur-input koyla)]
       ^{:key (str (:word card)-(random-uuid))} ;; random-uuid technically impure but it is worth the simplicity
-      [card-comp card])]])
+      [card-comp card])]
+   ])
 
 ;; Specs
