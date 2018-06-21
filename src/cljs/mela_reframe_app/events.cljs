@@ -2,7 +2,7 @@
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.db :as db :refer [spec-it]]
             [cljs.spec.alpha :as spec]
-            [mela-reframe-app.subs :as subs]
+            [mela-reframe-app.subs :as subs :refer [<sub]]
             [ajax.core :as ajax]
             [day8.re-frame.http-fx]
             [cljs.pprint :as pp]
@@ -22,6 +22,7 @@
  (fn [db [_ active-panel]]
    (assoc db :active-panel active-panel)))
 
+
 ;; call database funcs
 
 (def trim-event
@@ -31,7 +32,13 @@
               (let [trim-fn (fn [event] (-> event rest vec))]
                 (update-in context [:coeffects :event] trim-fn)))))
 
-;; TODO: limit words to some number
+;; Handle current language state
+(re-frame/reg-event-db
+ :change-lang
+ [trim-event]
+ (fn [db [cur-lang]]
+   (assoc db :cur-lang cur-lang)))
+
 (reg-event-db
  :process-response
  [check-spec-interceptor
@@ -72,8 +79,9 @@
   (if (and (= 1 (count word))
            (not (some #(= word %) (:first-letters db))))
     ;; true
+    ;; TODO: fix the call to api
     {:db (assoc-in db [:search-input] word)
-     :dispatch [:request-words "words" word]
+     :dispatch [:request-words (if (= (<sub [::subs/cur-lang]) "English") "words" "las") word]
      :set-first-letters word}
     ;; else
     {:db (assoc-in db [:search-input] word)})
