@@ -36,3 +36,11 @@
    (if (= lang "English")
      "Mela"
      "English")))
+
+(reg-sub
+ ::placeholder
+ :<- [::cur-lang]
+ (fn [lang _]
+   (if (= lang "English")
+     (str "Type any English word to translate")
+     (str "Ta fasayla e la day lapey fe Mela"))))

@@ -3,19 +3,22 @@
             [mela-reframe-app.db :as db :refer [spec-it]]
             [clojure.spec.alpha :as spec]
             [mela-reframe-app.subs :as subs :refer [>dis]]))
-
-;; (def check-spec-interceptor (re-frame/after (partial check-and-throw :re-frame.db/app-db)))
+;; Specs
+(spec/def ::placeholder string?)
 
 ;; view
 
-(defn search-field [cur-lang]
+(defn search-field [cur-lang placeholder >dis-search-input-entered]
+  "Pure function: on-change calls passed in function with one value to dispatch"
+  ;; spec-it
+  (spec-it ::db/cur-lang cur-lang)
+  (spec-it ::placeholder placeholder)
+  ;;
   [:input.word-filter-input
-   {:placeholder (if (= cur-lang "English")
-                   (str "Type any English word to translate")
-                   (str "Ta fasayla e la day lapey fe Mela"))
+   {:placeholder placeholder
     :autoFocus "autoFocus"
     :on-change
-    #(>dis [:search-input-entered (-> % .-target .-value)])}]) ;; side-effect TODO: figure out a pure way
+    #(>dis-search-input-entered (-> % .-target .-value))}])
 
 (defn find-word [word dict]
   "Takes 'word' string and 'words' vector of maps that should contain :word key with string."
@@ -35,10 +38,15 @@
    [:li [:strong "Mela: "] la]
    [:li [:strong "Comment: "] comment]])
 
-(defn koyla-panel [koyla cur-input cur-lang target-lang]
+(defn koyla-panel [koyla
+                   cur-input
+                   cur-lang
+                   target-lang
+                   placeholder
+                   >dis-search-input-entered]
   [:div
    [:label.koyla-source-label cur-lang]
-   [ search-field cur-lang ]
+   [ search-field cur-lang placeholder >dis-search-input-entered]
 
    [:div.word-results-row
     [:label.koyla-target-label target-lang]
@@ -53,4 +61,3 @@
       [card-comp card])]
    ])
 
-;; Specs

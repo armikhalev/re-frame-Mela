@@ -61,13 +61,13 @@
 
 (reg-event-fx
  :request-words
- (fn [{db :db} [_ language first-letter]]     ;; <-- 1st argument is coeffect, from which we extract db
+ (fn [{db :db} [_ lang first-letter]]     ;; <-- 1st argument is coeffect, from which we extract db
    ;; we return a map of (side) effects
    {:http-xhrio {:method          :get
                  :api (js/XMLHttpRequest.)
                  :headers {"Accept" "application/vnd.api+json"}
                  :uri             (str "http://melasi.pythonanywhere.com/koyla/"
-                                       language ;; words - english / las - mela
+                                       lang ;; words - english / las - mela
                                        "?letter="
                                        first-letter)
                  :response-format (ajax/json-response-format {:keywords? true})
@@ -80,9 +80,12 @@
            (not (some #(= word %) (:first-letters db))))
     ;; true
     ;; TODO: fix the call to api
-    {:db (assoc-in db [:search-input] word)
-     :dispatch [:request-words (if (= (<sub [::subs/cur-lang]) "English") "words" "las") word]
-     :set-first-letters word}
+    (let [lang (if (= (:cur-lang db) "English")
+                 "words"
+                 "las")]
+      {:db (assoc-in db [:search-input] word)
+       :dispatch [:request-words lang word]
+       :set-first-letters word})
     ;; else
     {:db (assoc-in db [:search-input] word)})
   )

@@ -46,6 +46,7 @@
 (spec/def ::word string?)
 (spec/def ::la string?)
 (spec/def ::comment string?)
+(spec/def ::cur-lang string?)
 
 (spec/def ::card (spec/keys :req-un [::word ::la ::comment]))
 (spec/def ::words (spec/coll-of ::card))
