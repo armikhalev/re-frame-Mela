@@ -42,7 +42,8 @@
   {:dev
    {:dependencies [[binaryage/devtools "0.9.10"]
                    [figwheel-sidecar "0.5.16"]
-                   [cider/piggieback "0.3.1"]]
+                   [cider/piggieback "0.3.1"]
+                   [day8.re-frame/re-frame-10x "0.3.3"]]
 
     :plugins      [[lein-figwheel "0.5.16"]
                    [lein-doo "0.1.8"]
@@ -59,7 +60,8 @@
                     :output-dir           "resources/public/js/compiled/out"
                     :asset-path           "js/compiled/out"
                     :source-map-timestamp true
-                    :preloads             [devtools.preload]
+                    :closure-defines      {"re_frame.trace.trace_enabled_QMARK_" true, goog.DEBUG true}
+                    :preloads             [day8.re-frame-10x.preload, devtools.preload]
                     :external-config      {:devtools/config {:features-to-install :all}}
                     }}
 
@@ -67,8 +69,8 @@
      :source-paths ["src/cljs"]
      :compiler     {:main            mela-reframe-app.core
                     :output-to       "resources/public/js/compiled/app.js"
-                    :optimizations   :advanced
-                    :closure-defines {goog.DEBUG false}
+                    :optimizations   :none
+                    :closure-defines {goog.DEBUG true}
                     :pretty-print    false}}
 
     {:id           "test"

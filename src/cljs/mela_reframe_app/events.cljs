@@ -47,6 +47,8 @@
    (update-in db [:words] into
           (reduce
            (fn [acc data]
+             ;; TODO: filter out cards that are already in database
+;; (filter ())
              (conj acc
                    (:attributes data)))
            []
@@ -77,15 +79,18 @@
 (defn handle-search-input-entered
   [{:keys [db]} [_ word]]
   (if (and (= 1 (count word))
-           (not (some #(= word %) (:first-letters db))))
+           (not
+            (some #(= word %)
+                  ;; gets :first-letters by :cur-lang - "English" || "Mela"
+                  (get (:first-letters db) (:cur-lang db))))) 
     ;; true
-    ;; TODO: fix the call to api
-    (let [lang (if (= (:cur-lang db) "English")
+    (let [cur-lang (:cur-lang db)
+          lang (if (= cur-lang "English")
                  "words"
                  "las")]
       {:db (assoc-in db [:search-input] word)
        :dispatch [:request-words lang word]
-       :set-first-letters word})
+       :set-first-letters [cur-lang word]})
     ;; else
     {:db (assoc-in db [:search-input] word)})
   )
