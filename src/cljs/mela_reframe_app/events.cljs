@@ -25,6 +25,7 @@
 
 ;; call database funcs
 
+;; interceptor
 (def trim-event
   (re-frame.core/->interceptor
    :id      :trim-event
@@ -32,8 +33,28 @@
               (let [trim-fn (fn [event] (-> event rest vec))]
                 (update-in context [:coeffects :event] trim-fn)))))
 
+;; helper
+(defn reduce-response [response]
+  "Helper fn used in filter-response & :process-response event-handler"
+  (reduce (fn [acc data]
+            (conj acc
+                  (assoc (:attributes data) :id (:id data)))) ;; get id that comes from api
+          []
+          response))
+
+;; interceptor
+(def filter-response
+  "Filter out data that is already present in db"
+  (re-frame.core/->interceptor
+   :id     :filter-response
+   :before (fn [context]
+             (let [response (set (reduce-response (:data (first (get-in context [:coeffects :event])))))
+                   words (set (get-in context [:coeffects :db :words]))]
+               (assoc-in context [:coeffects :event] (into [] (clojure.set/union words response)))
+               ))))
+
 ;; Handle current language state
-(re-frame/reg-event-db
+(reg-event-db
  :change-lang
  [trim-event]
  (fn [db [cur-lang]]
@@ -42,17 +63,11 @@
 (reg-event-db
  :process-response
  [check-spec-interceptor
-  trim-event]
- (fn [db [response]]           ;; destructure the response from the event vector
-   (update-in db [:words] into
-          (reduce
-           (fn [acc data]
-             ;; TODO: filter out cards that are already in database
-;; (filter ())
-             (conj acc
-                   (:attributes data)))
-           []
-           (:data (js->clj response))))))
+  trim-event
+  filter-response]
+ (fn [db response]           ;; destructure the response from the event vector
+   (assoc-in db [:words]
+              (js->clj response))))
 
  (reg-event-db
   :bad-response

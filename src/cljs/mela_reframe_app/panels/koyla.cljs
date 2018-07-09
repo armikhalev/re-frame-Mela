@@ -2,6 +2,7 @@
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.db :as db :refer [spec-it]]
             [clojure.spec.alpha :as spec]
+            [cljs.pprint :as pp]
             [mela-reframe-app.subs :as subs :refer [>dis]]))
 ;; Specs
 (spec/def ::placeholder string?)
@@ -69,9 +70,9 @@
     (let [card-comp (if (= cur-lang "English")
                       english-card-comp
                       mela-card-comp)]
-
       (for [card (find-word search-input words cur-lang)]
-        ^{:key (str (:word card)-(random-uuid))} ;; random-uuid technically impure but it is worth the simplicity
+        ;; random-uuid technically impure but it is worth the simplicity
+        ^{:key (str (:word card)"-"(:id card)"-"cur-lang)}
         [card-comp card]))]
    ])
 
