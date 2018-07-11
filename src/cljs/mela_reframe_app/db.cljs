@@ -7,11 +7,16 @@
 ;; DB
 
 (def default-db
-  {:words         [],
-   :first-letters {"Mela" []
-                   "English" ["a"]}, ;; since it is called on the first render
-   :cur-lang "English"
-   :search-input  ""})
+  {:words            [],
+
+   :grammar-cards    [],
+
+   :first-letters    {"Mela" [],
+                      "English" ["a"]}, ;; since it is called on the first render
+
+   :cur-lang          "English"
+
+   :search-input      ""})
 
 ;; coeffects and effects
 

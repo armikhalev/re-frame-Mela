@@ -2,8 +2,9 @@
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.panels.koyla :refer [koyla-panel]]
             [mela-reframe-app.subs :as subs :refer [<sub]]
-            [mela-reframe-app.dispatchers :as disps]
-            ))
+            [mela-reframe-app.dispatchers :as disps
+             :refer [>dis-search-input-entered
+                     >dis-change-lang]]))
 
 
 ;; home
@@ -33,7 +34,8 @@
                   (<sub [::subs/cur-lang])
                   (<sub [::subs/target-lang])
                   (<sub [::subs/placeholder])
-                  disps/>dis-search-input-entered]
+                  >dis-search-input-entered
+                  >dis-change-lang]
     :textbook-panel [textbook-panel]
     [:div]))
 

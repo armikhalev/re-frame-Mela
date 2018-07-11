@@ -20,5 +20,6 @@
   (routes/app-routes)
   (re-frame/dispatch-sync [::events/initialize-db])
   (re-frame/dispatch [:request-words "words" "a"])
+  (re-frame/dispatch [:request-grammar-cards])
   (dev-setup)
   (mount-root))

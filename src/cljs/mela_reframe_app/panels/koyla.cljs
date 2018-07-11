@@ -54,7 +54,8 @@
                    cur-lang
                    target-lang
                    placeholder
-                   >dis-search-input-entered]
+                   >dis-search-input-entered
+                   >dis-change-lang]
   [:div
    [:label.koyla-source-label cur-lang]
    [ search-field cur-lang placeholder >dis-search-input-entered]
@@ -63,7 +64,7 @@
     [:label.koyla-target-label target-lang]
     [:button.koyla-change-button
      {:type "submit"
-      :on-click #(>dis [:change-lang target-lang])}
+      :on-click #(>dis-change-lang target-lang)}
      (str "Change to " target-lang)]
 
     ;; word cards
@@ -71,7 +72,6 @@
                       english-card-comp
                       mela-card-comp)]
       (for [card (find-word search-input words cur-lang)]
-        ;; random-uuid technically impure but it is worth the simplicity
         ^{:key (str (:word card)"-"(:id card)"-"cur-lang)}
         [card-comp card]))]
    ])
