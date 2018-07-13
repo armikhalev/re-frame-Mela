@@ -12,12 +12,12 @@
 ;; now we create an interceptor using `after`
 (def check-spec-interceptor (re-frame/after (partial spec-it ::db/db)))
 
-(re-frame/reg-event-db
+(reg-event-db
  ::initialize-db
  (fn [_ _]
    db/default-db))
 
-(re-frame/reg-event-db
+(reg-event-db
  ::set-active-panel
  (fn [db [_ active-panel]]
    (assoc db :active-panel active-panel)))
@@ -47,10 +47,12 @@
 (defn reduce-words-response [response]
   "Helper fn used in filter-response & :process-response event-handler"
   (reduce (fn [acc data]
-            (->> data
-                 (:id)
-                 (assoc (:attributes data) :id)
-                 (conj acc)))
+            (as-> data d
+              (:id d)
+              (assoc (:attributes data) :id d)
+              (get-in data [:relationships :grammar-card :data])
+              (assoc (:attributes data) :grammar-card d)
+              (conj acc d)))
           []
           response))
 
@@ -66,8 +68,6 @@
                                                             (:data))))
                    words (set (get-in context [:coeffects :db :words]))]
                (assoc-in context [:coeffects :event] (into [] (clojure.set/union words response)))))))
-
-;; TODO: Add grammar cards to words by id
 
 ;; Process response from 'request-words' event-fx
 (reg-event-db
@@ -123,22 +123,21 @@
     ;; else
     {:db (assoc-in db [:search-input] letter)}))
 
-(re-frame/reg-event-fx
+(reg-event-fx
  :search-input-entered
  handle-search-input-entered)
 
 ;; GRAMMAR CARDS HANDLERS
 
 ;; interceptor
-(def add-grammar-cards-to-words
+(def add-grammar-cards-to-db
   (re-frame.core/->interceptor
-   :id     :add-grammar-cards-to-words
+   :id     :add-grammar-cards-to-db
    :before (fn [context]
              (let [response (-> context
                                 (get-in , [:coeffects :event])
                                 first
-                                (:data))
-                   words (get-in context [:coeffects :db :words])]
+                                :data)]
                (assoc-in context [:coeffects :db :grammar-cards] (into [] response))))))
 
 (reg-event-db
@@ -146,13 +145,11 @@
  ;; interceptors
  [check-spec-interceptor
   trim-event
-  add-grammar-cards-to-words]
+  add-grammar-cards-to-db]
  ;;
- (fn [db response]
-   (assoc-in db [:grammar-cards]
-             (js->clj response))))
+ (fn [db response] db))
 
-(re-frame/reg-event-fx
+(reg-event-fx
  :request-grammar-cards
  (fn [{:keys [db]} _]
    ;; we return a map of (side) effects
@@ -163,3 +160,12 @@
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:process-request-grammar-cards-response]
                  :on-failure      [:bad-response]}}))
+
+(reg-event-db
+ :grammar-card-info-clicked
+ (fn [db [_ id]]
+   (assoc-in db [:cur-grammar-card-info]
+             (get-in (->> (:grammar-cards db)
+                          (filter #(= id (:id %)))
+                          first)
+                     [:attributes :body]))))

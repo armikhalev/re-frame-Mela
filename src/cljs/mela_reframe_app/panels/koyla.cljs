@@ -35,30 +35,54 @@
 
 ;; Cards
 
-(defn english-card-comp [{:keys [word la comment]}]
+(defn english-card-comp
+  [{:keys [word la comment grammar-card]}
+   >dis-grammar-card-info-clicked]
+  ;;
   [:ul.koyla-result-ul
    [:li [:strong "English: "] word]
    [:li [:strong "Mela: "] la]
-   [:li [:strong "Comment: "] comment]])
+   [:li [:strong "Comment: "] comment]
+   (if (some? grammar-card)
+     [:div.koyla-info-icon
+      {:on-click #(>dis-grammar-card-info-clicked (:id grammar-card))}
+      [:div.info-icon
+        "Click me"]])])
 
-(defn mela-card-comp [{:keys [word la comment]}]
+(defn mela-card-comp
+  [{:keys [word la comment grammar-card]}
+   >dis-grammar-card-info-clicked]
+  ;;
   [:ul.koyla-result-ul
    [:li [:strong "Mela: "] la]
    [:li [:strong "Engila: "] word]
-   [:li [:strong "Dasayna: "] comment]])
+   [:li [:strong "Dasayna: "] comment]
+
+  (if (some? grammar-card)
+    [:div.koyla-info-icon
+     {:on-click #(>dis-grammar-card-info-clicked (:id grammar-card))}
+     [:div.info-icon
+      "Click me"]])])
+
+(defn text-book-comp [grammar-card-info]
+  [:div.text-book-component-container
+   [:div.text-book-component-info
+    grammar-card-info]])
 
 ;; Main
 
 (defn koyla-panel [words
                    search-input
                    cur-lang
+                   cur-grammar-card-info
                    target-lang
                    placeholder
                    >dis-search-input-entered
-                   >dis-change-lang]
+                   >dis-change-lang
+                   >dis-grammar-card-info-clicked]
   [:div
    [:label.koyla-source-label cur-lang]
-   [ search-field cur-lang placeholder >dis-search-input-entered]
+   [search-field cur-lang placeholder >dis-search-input-entered]
 
    [:div.word-results-row
     [:label.koyla-target-label target-lang]
@@ -73,6 +97,6 @@
                       mela-card-comp)]
       (for [card (find-word search-input words cur-lang)]
         ^{:key (str (:word card)"-"(:id card)"-"cur-lang)}
-        [card-comp card]))]
-   ])
+        [card-comp card >dis-grammar-card-info-clicked]))]
+   [text-book-comp cur-grammar-card-info]])
 

@@ -20,6 +20,12 @@
    (:words db)))
 
 (reg-sub
+ ::cur-grammar-card-info
+ (fn [db _]
+   (:cur-grammar-card-info db)))
+
+
+(reg-sub
  ::first-letters
  (fn [db _]
    (:first-letters db)))

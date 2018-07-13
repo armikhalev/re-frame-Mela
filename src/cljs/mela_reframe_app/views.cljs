@@ -4,7 +4,8 @@
             [mela-reframe-app.subs :as subs :refer [<sub]]
             [mela-reframe-app.dispatchers :as disps
              :refer [>dis-search-input-entered
-                     >dis-change-lang]]))
+                     >dis-change-lang
+                     >dis-grammar-card-info-clicked]]))
 
 
 ;; home
@@ -32,10 +33,12 @@
                   (<sub [::subs/words])
                   (<sub [::subs/search-input])
                   (<sub [::subs/cur-lang])
+                  (<sub [::subs/cur-grammar-card-info])
                   (<sub [::subs/target-lang])
                   (<sub [::subs/placeholder])
                   >dis-search-input-entered
-                  >dis-change-lang]
+                  >dis-change-lang
+                  >dis-grammar-card-info-clicked]
     :textbook-panel [textbook-panel]
     [:div]))
 
