@@ -46,8 +46,9 @@
    (if (some? grammar-card)
      [:div.koyla-info-icon
       {:on-click #(>dis-grammar-card-info-clicked (:id grammar-card))}
-      [:div.info-icon
-        "Click me"]])])
+      [:img.info-icon
+       {:src "images/info_icon.png"
+        :alt "info icon"}]])])
 
 (defn mela-card-comp
   [{:keys [word la comment grammar-card]}
@@ -61,13 +62,34 @@
   (if (some? grammar-card)
     [:div.koyla-info-icon
      {:on-click #(>dis-grammar-card-info-clicked (:id grammar-card))}
-     [:div.info-icon
-      "Click me"]])])
+     [:img.info-icon
+      {:src "images/info_icon.png"
+       :alt "info icon"}]])])
 
-(defn text-book-comp [grammar-card-info]
+(defn text-book-comp
+  [{:keys [title body comment] :as args}
+   >dis-hide-grammar-card
+   <sub-grammar-card-show?]
+  ;; spec-it
+  (spec-it ::db/cur-grammar-card-info args)
+  ;;
   [:div.text-book-component-container
+   {:class (if <sub-grammar-card-show?
+             "text-book-component-show"
+             "text-book-component-hide")}
+
+   [:img.text-book-component-hide-btn
+    {:on-click #(>dis-hide-grammar-card)
+     :src "images/cancel_button.png"
+     :alt "hide textbook component card button"}]
    [:div.text-book-component-info
-    grammar-card-info]])
+    [:header
+     [:strong "Title: "]
+     title]
+    body
+    [:div
+     [:strong "Comment: "]
+     comment]]])
 
 ;; Main
 
@@ -79,7 +101,9 @@
                    placeholder
                    >dis-search-input-entered
                    >dis-change-lang
-                   >dis-grammar-card-info-clicked]
+                   >dis-grammar-card-info-clicked
+                   >dis-hide-grammar-card
+                   <sub-grammar-card-show?]
   [:div
    [:label.koyla-source-label cur-lang]
    [search-field cur-lang placeholder >dis-search-input-entered]
@@ -95,8 +119,19 @@
     (let [card-comp (if (= cur-lang "English")
                       english-card-comp
                       mela-card-comp)]
+
       (for [card (find-word search-input words cur-lang)]
         ^{:key (str (:word card)"-"(:id card)"-"cur-lang)}
-        [card-comp card >dis-grammar-card-info-clicked]))]
-   [text-book-comp cur-grammar-card-info]])
+
+        [card-comp
+
+         card
+         >dis-grammar-card-info-clicked
+         ]))]
+
+   [text-book-comp
+
+    cur-grammar-card-info
+    >dis-hide-grammar-card
+    <sub-grammar-card-show?]])
 

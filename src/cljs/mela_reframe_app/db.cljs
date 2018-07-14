@@ -16,7 +16,12 @@
 
    :cur-lang                "English"
 
-   :cur-grammar-card-info   ""
+   :cur-grammar-card-info   {:title ""
+                             :body ""
+                             :comment ""
+                             :category ""}
+
+   :grammar-card-show?      false
 
    :search-input            ""})
 
@@ -45,9 +50,14 @@
 (spec/def ::comment string?)
 (spec/def ::cur-lang string?)
 
+(spec/def ::title string?)
+(spec/def ::body string?)
+(spec/def ::comment string?)
+(spec/def ::cur-grammar-card-info (spec/keys :req-un [::title ::body ::comment] ))
+
 (spec/def ::card (spec/keys :req-un [::word ::la ::comment]))
 (spec/def ::words (spec/coll-of ::card))
-(spec/def ::db (spec/keys :req-un [::words]))
+(spec/def ::db (spec/keys :req-un [::words ]))
 
 (defn spec-it
   "Throws an exception if `value` doesn't match the Spec `a-spec`."

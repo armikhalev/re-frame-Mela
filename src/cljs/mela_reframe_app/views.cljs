@@ -5,7 +5,8 @@
             [mela-reframe-app.dispatchers :as disps
              :refer [>dis-search-input-entered
                      >dis-change-lang
-                     >dis-grammar-card-info-clicked]]))
+                     >dis-grammar-card-info-clicked
+                     >dis-hide-grammar-card]]))
 
 
 ;; home
@@ -38,7 +39,9 @@
                   (<sub [::subs/placeholder])
                   >dis-search-input-entered
                   >dis-change-lang
-                  >dis-grammar-card-info-clicked]
+                  >dis-grammar-card-info-clicked
+                  >dis-hide-grammar-card
+                  (<sub [::subs/grammar-card-show?])]
     :textbook-panel [textbook-panel]
     [:div]))
 

@@ -2,7 +2,7 @@
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.db :as db :refer [spec-it]]
             [cljs.spec.alpha :as spec]
-            [mela-reframe-app.subs :as subs :refer [<sub]]
+            [mela-reframe-app.subs :as subs :refer [<sub >dis]]
             [ajax.core :as ajax]
             [day8.re-frame.http-fx]
             [cljs.pprint :as pp]
@@ -129,6 +129,16 @@
 
 ;; GRAMMAR CARDS HANDLERS
 
+(reg-event-db
+ :show-grammar-card
+ (fn [db _]
+   (assoc db :grammar-card-show? true)))
+
+(reg-event-db
+ :hide-grammar-card
+ (fn [db _]
+   (assoc db :grammar-card-show? false)))
+
 ;; interceptor
 (def add-grammar-cards-to-db
   (re-frame.core/->interceptor
@@ -161,11 +171,22 @@
                  :on-success      [:process-request-grammar-cards-response]
                  :on-failure      [:bad-response]}}))
 
+;; interceptor
+(def show-grammar-card
+  (re-frame.core/->interceptor
+   :id     :show-grammar-card
+   :after (fn [context]
+            (assoc-in context [:effects :db :grammar-card-show?] true))))
+
 (reg-event-db
  :grammar-card-info-clicked
+ ;; interceptors
+ [show-grammar-card]
+ ;;
  (fn [db [_ id]]
    (assoc-in db [:cur-grammar-card-info]
              (get-in (->> (:grammar-cards db)
                           (filter #(= id (:id %)))
                           first)
-                     [:attributes :body]))))
+                     [:attributes]))))
+

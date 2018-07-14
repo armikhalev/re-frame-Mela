@@ -24,6 +24,10 @@
  (fn [db _]
    (:cur-grammar-card-info db)))
 
+(reg-sub
+ ::grammar-card-show?
+ (fn [db _]
+   (:grammar-card-show? db)))
 
 (reg-sub
  ::first-letters
