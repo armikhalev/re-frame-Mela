@@ -9,6 +9,8 @@
 (def default-db
   {:words                   [],
 
+   :show-menu?              false,
+
    :grammar-cards           [],
 
    :first-letters           {"Mela" [],

@@ -12,6 +12,14 @@
 ;; now we create an interceptor using `after`
 (def check-spec-interceptor (re-frame/after (partial spec-it ::db/db)))
 
+;; interceptor
+(def trim-event
+  (re-frame.core/->interceptor
+   :id      :trim-event
+   :before  (fn [context]
+              (let [trim-fn (fn [event] (-> event rest vec))]
+                (update-in context [:coeffects :event] trim-fn)))))
+
 (reg-event-db
  ::initialize-db
  (fn [_ _]
@@ -22,13 +30,15 @@
  (fn [db [_ active-panel]]
    (assoc db :active-panel active-panel)))
 
-;; interceptor
-(def trim-event
-  (re-frame.core/->interceptor
-   :id      :trim-event
-   :before  (fn [context]
-              (let [trim-fn (fn [event] (-> event rest vec))]
-                (update-in context [:coeffects :event] trim-fn)))))
+(reg-event-db
+ :set-show-menu
+ [trim-event]
+ (fn [db [set-show-menu]]
+   ;; spec
+   (spec-it (spec/def ::set-show-menu boolean?) set-show-menu)
+   ;;
+   (pp/pprint (assoc db :show-menu? set-show-menu))
+   (assoc db :show-menu? set-show-menu)))
 
 ;;--------------------;;
 ;; Call database funcs

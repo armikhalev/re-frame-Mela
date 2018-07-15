@@ -109,11 +109,15 @@
    [search-field cur-lang placeholder >dis-search-input-entered]
 
    [:div.word-results-row
-    [:label.koyla-target-label target-lang]
+    [:label.koyla-target-label (if (= cur-lang "English")
+                                 target-lang
+                                 "Engila")]
     [:button.koyla-change-button
      {:type "submit"
       :on-click #(>dis-change-lang target-lang)}
-     (str "Change to " target-lang)]
+     (if (= cur-lang "English")
+       "Change to Mela"
+       "Ali tu Engila")]
 
     ;; word cards
     (let [card-comp (if (= cur-lang "English")

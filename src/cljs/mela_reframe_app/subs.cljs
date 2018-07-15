@@ -10,6 +10,11 @@
    (:active-panel db)))
 
 (reg-sub
+ ::show-menu?
+ (fn [db _]
+   (:show-menu? db)))
+
+(reg-sub
  ::search-input
  (fn [db _]
    (:search-input db)))
