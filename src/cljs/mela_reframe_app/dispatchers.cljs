@@ -19,9 +19,5 @@
   (>dis [:grammar-card-info-clicked id]))
 
 (defn >dis-show-grammar-card
-  [id]
-  (>dis [:show-grammar-card]))
-
-(defn >dis-hide-grammar-card
-  [id]
-  (>dis [:hide-grammar-card]))
+  [show?]
+  (>dis [:show-grammar-card show?]))

@@ -6,7 +6,7 @@
              :refer [>dis-search-input-entered
                      >dis-change-lang
                      >dis-grammar-card-info-clicked
-                     >dis-hide-grammar-card
+                     >dis-show-grammar-card
                      >dis-set-show-menu]]))
 
 
@@ -41,7 +41,7 @@
                   >dis-search-input-entered
                   >dis-change-lang
                   >dis-grammar-card-info-clicked
-                  >dis-hide-grammar-card
+                  >dis-show-grammar-card
                   (<sub [::subs/grammar-card-show?])]
     :textbook-panel [textbook-panel]
     [:div]))

@@ -35,9 +35,8 @@
  [trim-event]
  (fn [db [set-show-menu]]
    ;; spec
-   (spec-it (spec/def ::set-show-menu boolean?) set-show-menu)
+   (spec/valid? boolean? set-show-menu)
    ;;
-   (pp/pprint (assoc db :show-menu? set-show-menu))
    (assoc db :show-menu? set-show-menu)))
 
 ;;--------------------;;
@@ -141,13 +140,8 @@
 
 (reg-event-db
  :show-grammar-card
- (fn [db _]
-   (assoc db :grammar-card-show? true)))
-
-(reg-event-db
- :hide-grammar-card
- (fn [db _]
-   (assoc db :grammar-card-show? false)))
+ (fn [db [_ show?]]
+   (assoc db :grammar-card-show? show?)))
 
 ;; interceptor
 (def add-grammar-cards-to-db

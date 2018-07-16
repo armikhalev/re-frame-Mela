@@ -68,7 +68,7 @@
 
 (defn text-book-comp
   [{:keys [title body comment] :as args}
-   >dis-hide-grammar-card
+   >dis-show-grammar-card
    <sub-grammar-card-show?]
   ;; spec-it
   (spec-it ::db/cur-grammar-card-info args)
@@ -79,7 +79,7 @@
              "text-book-component-hide")}
 
    [:img.text-book-component-hide-btn
-    {:on-click #(>dis-hide-grammar-card)
+    {:on-click #(>dis-show-grammar-card false)
      :src "images/cancel_button.png"
      :alt "hide textbook component card button"}]
    [:div.text-book-component-info
@@ -102,7 +102,7 @@
                    >dis-search-input-entered
                    >dis-change-lang
                    >dis-grammar-card-info-clicked
-                   >dis-hide-grammar-card
+                   >dis-show-grammar-card
                    <sub-grammar-card-show?]
   [:div
    [:label.koyla-source-label cur-lang]
@@ -136,6 +136,6 @@
    [text-book-comp
 
     cur-grammar-card-info
-    >dis-hide-grammar-card
+    >dis-show-grammar-card
     <sub-grammar-card-show?]])
 
