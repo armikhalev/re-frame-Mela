@@ -1,6 +1,7 @@
 (ns mela-reframe-app.views
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.panels.koyla :refer [koyla-panel]]
+            [mela-reframe-app.panels.latay :refer [latay-panel]]
             [mela-reframe-app.subs :as subs :refer [<sub >dis]]
             [mela-reframe-app.dispatchers :as disps
              :refer [>dis-search-input-entered
@@ -14,12 +15,6 @@
 (defn home-panel []
   (let [name "Home"]
     [:div (str "Hello from " name ". This is the Home Page.")]))
-
-
-;; latay
-
-(defn latay-panel []
-  [:div "This is the Basic Words (Latay)Page."])
 
 ;; Textbook
 (defn textbook-panel []
@@ -58,15 +53,20 @@
         (if (<sub [::subs/show-menu?])
           "show-menu")}
        [:ul
-        ;; TODO: make data structure out of nav items and loop
-        [:li [:a {:href "#/"
-                  :on-click #(>dis-set-show-menu false)} "Home"]]
-        [:li [:a {:href "#/latay"
-                  :on-click #(>dis-set-show-menu false)} "Basic Words"]]
-        [:li [:a {:href "#/koyla"
-                  :on-click #(>dis-set-show-menu false)} "Translator"]]
-        [:li [:a {:href "#/textbook"
-                  :on-click #(>dis-set-show-menu false)} "Textbook"]]]]]
+        ;; Adds new pages to navbar
+        (let [page-links [{:href "#/", :title "Home"}
+                          {:href "#/latay", :title "Basic Words"}
+                          {:href "#/koyla", :title "Translator"}
+                          {:href "#/textbook", :title "Textbook"}]]
+          ;;
+          (for [pl page-links]
+            ^{:key (str (:href pl)"-"(:title pl)"-"panel-name)}
+            [:li
+             [:a
+              {:href (:href pl)
+               :on-click #(>dis-set-show-menu false)}
+              (:title pl)]]))]]]
+   ;;
    [:main.main-container
     {:on-click #(>dis-set-show-menu false)}
     [panels panel-name]]])
