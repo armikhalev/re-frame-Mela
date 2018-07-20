@@ -5,10 +5,12 @@
             [mela-reframe-app.subs :as subs :refer [<sub >dis]]
             [mela-reframe-app.dispatchers :as disps
              :refer [>dis-search-input-entered
+                     >dis-basic-words-search-input-entered
                      >dis-change-lang
                      >dis-grammar-card-info-clicked
                      >dis-show-grammar-card
-                     >dis-set-show-menu]]))
+                     >dis-set-show-menu
+                     >dis-flip-card]]))
 
 
 ;; home
@@ -25,7 +27,10 @@
 (defn- panels [panel-name]
   (case panel-name
     :home-panel [home-panel]
-    :latay-panel [latay-panel]
+    :latay-panel [latay-panel
+                  >dis-basic-words-search-input-entered
+                  (<sub [::subs/basic-words])
+                  >dis-flip-card]
     :koyla-panel [koyla-panel
                   (<sub [::subs/words])
                   (<sub [::subs/search-input])

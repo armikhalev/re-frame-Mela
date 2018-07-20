@@ -6,6 +6,10 @@
   [value]
   (>dis [:search-input-entered value]))
 
+(defn >dis-basic-words-search-input-entered
+  [value]
+  (>dis [:basic-words-search-input-entered value]))
+
 (defn >dis-set-show-menu
   [set-show-menu]
   (>dis [:set-show-menu set-show-menu]))
@@ -21,3 +25,9 @@
 (defn >dis-show-grammar-card
   [show?]
   (>dis [:show-grammar-card show?]))
+
+;; Latay
+
+(defn >dis-flip-card
+  [flip? id]
+  (>dis [:flip-card flip? id]))

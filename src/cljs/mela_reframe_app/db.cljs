@@ -29,9 +29,11 @@
 ;; DB
 
 (def default-db
-  {:words                   [],
-
+  {;; Common
    :show-menu?              false,
+
+   ;; Koyla - Translator page
+   :words                   [],
 
    :grammar-cards           [],
 
@@ -45,9 +47,16 @@
                              :comment ""
                              :category ""}
 
-   :grammar-card-show?      false
+   :grammar-card-show?        false
 
-   :search-input            ""})
+   :search-input              ""
+
+   ;; Latay - basic words page
+
+   :basic-words               []
+
+   :basic-words-search-input  ""
+   })
 
 ;; Spec for below reg-fx :set-first-letters
 (spec/def ::arg1-set-first-letters

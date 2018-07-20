@@ -59,3 +59,10 @@
    (if (= lang "English")
      (str "Type any English word to translate")
      (str "Ta fasayla e la day lapey fe Mela"))))
+
+;; Koyla
+
+(reg-sub
+ ::basic-words
+ (fn [db _]
+   (:basic-words db)))

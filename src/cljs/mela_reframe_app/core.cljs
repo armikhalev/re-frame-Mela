@@ -21,5 +21,6 @@
   (re-frame/dispatch-sync [::events/initialize-db])
   (re-frame/dispatch [:request-words "words" "a"])
   (re-frame/dispatch [:request-grammar-cards])
+  (re-frame/dispatch [:request-basic-words])
   (dev-setup)
   (mount-root))

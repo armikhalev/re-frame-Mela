@@ -194,3 +194,56 @@
                           first)
                      [:attributes]))))
 
+;; LATAY
+
+;; interceptor
+(def add-basic-words-to-db
+  (re-frame.core/->interceptor
+   :id     :add-basic-words-to-db
+   :before (fn [context]
+             (let [response (-> context
+                                (get-in , [:coeffects :event])
+                                first
+                                :data)]
+               (assoc-in context [:coeffects :db :basic-words] (into [] response))))))
+
+(reg-event-db
+ :process-request-basic-words-response
+ ;; interceptors
+ [check-spec-interceptor
+  trim-event
+  add-basic-words-to-db]
+ ;;
+ (fn [db response] db))
+
+(reg-event-fx
+ :request-basic-words
+ (fn [{:keys [db]} _]
+   ;; we return a map of (side) effects
+   {:http-xhrio {:method          :get
+                 :api (js/XMLHttpRequest.)
+                 :headers {"Accept" "application/vnd.api+json"}
+                 :uri             "http://melasi.pythonanywhere.com/koyla/cards"
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [:process-request-basic-words-response]
+                 :on-failure      [:bad-response]}}))
+
+(reg-event-db
+ :basic-words-search-input-entered
+ ;; interceptors
+ [check-spec-interceptor
+  trim-event]
+ ;;
+ (fn [db [letter]]
+   (assoc-in db [:basic-words-search-input] letter)))
+
+(reg-event-db
+ :flip-card
+ ;; interceptors
+ [check-spec-interceptor
+  trim-event]
+ ;;
+ (fn [db [flip? id]]
+   (prn flip? id (:basic-words db))
+   db
+   #_(assoc-in db [:basic-words] )))
