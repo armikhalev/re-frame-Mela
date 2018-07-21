@@ -66,3 +66,8 @@
  ::basic-words
  (fn [db _]
    (:basic-words db)))
+
+(reg-sub
+ ::basic-words-search-input
+ (fn [db _]
+   (:basic-words-search-input db)))

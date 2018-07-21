@@ -4,7 +4,9 @@
             [mela-reframe-app.subs :as subs]
             [cljs.pprint :as pp]))
 
-;; Specs
+;; SPECS
+
+;; Koyla specs
 
 (spec/def ::word string?)
 (spec/def ::la string?)
@@ -18,13 +20,30 @@
 
 (spec/def ::card (spec/keys :req-un [::word ::la ::comment]))
 (spec/def ::words (spec/coll-of ::card))
-(spec/def ::db (spec/keys :req-un [::words ]))
+
+;; Latay specs 
+
+(spec/def ::id string?)
+(spec/def ::front string?)
+(spec/def ::back string?)
+(spec/def ::flip boolean?)
+(spec/def ::attributes (spec/keys :req-un [::front ::back ::flip]))
+
+(spec/def ::basic-word-card (spec/keys :req-un [::attributes ::id]))
+
+(spec/def ::basic-words (spec/coll-of ::basic-word-card))
+
+;; Common
+
+(spec/def ::db (spec/keys :req-un [::words ::basic-words]))
 
 (defn spec-it
   "Throws an exception if `value` doesn't match the Spec `a-spec`."
   [a-spec value]
   (when-not (spec/valid? a-spec value)
-    (js/console.log (str "spec check failed: " (spec/explain-str a-spec value)))))
+    (prn "spec check failed: =>" )
+    (println)
+    (pp/pprint (spec/explain a-spec value))))
 
 ;; DB
 

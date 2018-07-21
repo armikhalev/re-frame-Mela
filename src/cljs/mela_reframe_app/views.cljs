@@ -30,6 +30,7 @@
     :latay-panel [latay-panel
                   >dis-basic-words-search-input-entered
                   (<sub [::subs/basic-words])
+                  (<sub [::subs/basic-words-search-input])
                   >dis-flip-card]
     :koyla-panel [koyla-panel
                   (<sub [::subs/words])
