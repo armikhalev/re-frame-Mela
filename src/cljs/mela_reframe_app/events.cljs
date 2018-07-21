@@ -244,6 +244,11 @@
   trim-event]
  ;;
  (fn [db [flip? id]]
-   (prn flip? id (:basic-words db))
-   db
-   #_(assoc-in db [:basic-words] )))
+   (assoc-in db
+             [:basic-words]
+             (map
+              (fn [card*]
+                (if (= id (get-in card* [:id]))
+                  (update-in card* [:attributes :flip] not)
+                  card*))
+              (get-in db [:basic-words])))))
