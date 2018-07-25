@@ -1,7 +1,8 @@
 (ns mela-reframe-app.panels.koyla
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.db :as db :refer [spec-it]]
-            [mela-reframe-app.common :as common :refer [search-field]]
+            [mela-reframe-app.common :as common :refer [search-field
+                                                        text-book-comp]]
             [clojure.spec.alpha :as spec]
             [cljs.pprint :as pp]
             [mela-reframe-app.subs :as subs :refer [>dis]]))
@@ -52,31 +53,6 @@
      [:img.info-icon
       {:src "images/info_icon.png"
        :alt "info icon"}]])])
-
-(defn text-book-comp
-  [{:keys [title body comment] :as args}
-   >dis-show-grammar-card
-   <sub-grammar-card-show?]
-  ;; spec-it
-  (spec-it ::db/cur-grammar-card-info args)
-  ;;
-  [:div.text-book-component-container
-   {:class (if <sub-grammar-card-show?
-             "text-book-component-show"
-             "text-book-component-hide")}
-
-   [:img.text-book-component-hide-btn
-    {:on-click #(>dis-show-grammar-card false)
-     :src "images/cancel_button.png"
-     :alt "hide textbook component card button"}]
-   [:div.text-book-component-info
-    [:header
-     [:strong "Title: "]
-     title]
-    body
-    [:div
-     [:strong "Comment: "]
-     comment]]])
 
 ;; Main
 

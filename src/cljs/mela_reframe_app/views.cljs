@@ -31,7 +31,13 @@
                   >dis-basic-words-search-input-entered
                   (<sub [::subs/basic-words])
                   (<sub [::subs/basic-words-search-input])
-                  >dis-flip-card]
+                  >dis-flip-card
+                  >dis-grammar-card-info-clicked
+                  ;; grammar-cards
+                  >dis-show-grammar-card
+                  (<sub [::subs/cur-grammar-card-info])
+                  (<sub [::subs/grammar-card-show?])
+                  ]
     :koyla-panel [koyla-panel
                   (<sub [::subs/words])
                   (<sub [::subs/search-input])

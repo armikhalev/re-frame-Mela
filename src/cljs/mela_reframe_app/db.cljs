@@ -2,9 +2,15 @@
   (:require [re-frame.core :as re-frame]
             [clojure.spec.alpha :as spec]
             [mela-reframe-app.subs :as subs]
-            [cljs.pprint :as pp]))
+            [cljs.pprint :as pp]
+            [cljs.analyzer :as analyzer]))
 
 ;; SPECS
+
+(defmacro add-meta [expr]
+  (let [namespace {:namespace (name analyzer/*cljs-ns*)}
+        source-details (meta &form)]
+    `(with-meta ~expr '~(merge namespace source-details)))) 
 
 ;; Koyla specs
 
@@ -40,10 +46,11 @@
 (defn spec-it
   "Throws an exception if `value` doesn't match the Spec `a-spec`."
   [a-spec value]
-  (when-not (spec/valid? a-spec value)
-    (prn "spec check failed: =>" )
-    (println)
-    (pp/pprint (spec/explain a-spec value))))
+  (meta (add-meta
+         (when-not (spec/valid? a-spec value)
+           (prn "spec check failed: =>" )
+           (println)
+           (pp/pprint (spec/explain a-spec value))))))
 
 ;; DB
 

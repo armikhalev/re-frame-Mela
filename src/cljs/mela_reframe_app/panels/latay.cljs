@@ -1,6 +1,7 @@
 (ns mela-reframe-app.panels.latay
   (:require [re-frame.core :as re-frame]
-            [mela-reframe-app.common :as common :refer [search-field]]
+            [mela-reframe-app.common :as common :refer [search-field
+                                                        text-book-comp]]
             [mela-reframe-app.db :as db :refer [spec-it]]
             [clojure.spec.alpha :as spec]
             [cljs.pprint :as pp]
@@ -19,29 +20,57 @@
    dict))
 
 (defn basic-card-comp
-  [attributes id flip? >dis-flip-card]
+  [attributes
+   id
+   grammar-card
+   >dis-grammar-card-info-clicked
+   flip?
+   >dis-flip-card
+   ]
   ;;
   [:div.b-w-card-flip-container
    {:on-click #(>dis-flip-card flip? id)}
    [:div.b-w-card-flipper
     {:class (when flip? "b-w-card-flip")}
     [:div.b-w-card-card.b-w-card-frontCard (:front attributes)]
-    [:div.b-w-card-card.b-w-card-backCard (:back attributes)]]])
+    [:div.b-w-card-card.b-w-card-backCard (:back attributes)
+     (when grammar-card
+       [:div.b-w-card-info-icon
+        {:on-click (fn [e]
+                     (.stopPropagation e)
+                     (>dis-grammar-card-info-clicked grammar-card))}
+        [:img.info-icon
+         {:src "images/info_icon.png"
+          :alt "info icon"}]])
+     ]]])
 
 ;; Main
 
 (defn latay-panel [>dis-basic-words-search-input-entered
                    basic-words
                    basic-words-search-input
-                   >dis-flip-card]
+                   >dis-flip-card
+                   >dis-grammar-card-info-clicked
+                   ;; grammar-cards
+                   >dis-show-grammar-card
+                   cur-grammar-card-info
+                   <sub-grammar-card-show?
+                   ]
   [:div
    [search-field "Type Mela basic word, then click on card" >dis-basic-words-search-input-entered]
    [:div.word-results-row
-    (for [{:keys [id attributes]} (find-basic-word basic-words-search-input basic-words)]
+    (for [{:keys [id attributes grammar-card]} (find-basic-word basic-words-search-input basic-words)]
       ^{:key id}
       [basic-card-comp
        ;;
        attributes
        id
+       grammar-card
+       >dis-grammar-card-info-clicked
        (:flip attributes)
-       >dis-flip-card])]])
+       >dis-flip-card])]
+   [text-book-comp
+
+    cur-grammar-card-info
+    >dis-show-grammar-card
+    <sub-grammar-card-show?]])

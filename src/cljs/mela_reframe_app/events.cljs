@@ -201,11 +201,28 @@
   (re-frame.core/->interceptor
    :id     :add-basic-words-to-db
    :before (fn [context]
+             ;; get event data, it should contain :basic-words
              (let [response (-> context
                                 (get-in , [:coeffects :event])
                                 first
                                 :data)]
-               (assoc-in context [:coeffects :db :basic-words] (into [] response))))))
+
+               ;; add more convenient way of getting grammar-card's id associated with a basic-word
+               (assoc-in context
+                         [:coeffects :db :basic-words]
+                         ;; :basic-words is vector but reduce returns list, 'into' turns it into vector
+                         (into []
+                               ;; iterate over :basic-words extracting id and putting it back with :grammar-card key
+                               (reduce
+                                (fn [acc data]
+                                  (as-> data d
+                                    (get-in d [:relationships :grammar-card :data])
+                                    (if (contains? d :id) (:id d) false)
+                                    (assoc data :grammar-card d)
+                                    (conj acc d))
+                                  )
+                                [] response)
+                               ))))))
 
 (reg-event-db
  :process-request-basic-words-response
