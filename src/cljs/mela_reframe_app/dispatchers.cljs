@@ -31,3 +31,11 @@
 (defn >dis-flip-card
   [flip? id]
   (>dis [:flip-card flip? id]))
+
+(defn >dis-flip-all-basic-words->front
+  []
+  (>dis [:flip-all-basic-words->front]))
+
+(defn >dis-flip--all-basic-words->opposite-side
+  []
+  (>dis [:flip--all-basic-words->opposite-side]))

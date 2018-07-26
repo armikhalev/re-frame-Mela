@@ -10,6 +10,8 @@
                      >dis-grammar-card-info-clicked
                      >dis-show-grammar-card
                      >dis-set-show-menu
+                     >dis-flip-all-basic-words->front
+                     >dis-flip--all-basic-words->opposite-side
                      >dis-flip-card]]))
 
 
@@ -33,6 +35,8 @@
                   (<sub [::subs/basic-words-search-input])
                   >dis-flip-card
                   >dis-grammar-card-info-clicked
+                  >dis-flip-all-basic-words->front
+                  >dis-flip--all-basic-words->opposite-side
                   ;; grammar-cards
                   >dis-show-grammar-card
                   (<sub [::subs/cur-grammar-card-info])

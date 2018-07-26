@@ -51,14 +51,30 @@
                    basic-words-search-input
                    >dis-flip-card
                    >dis-grammar-card-info-clicked
+                   >dis-flip-all-basic-words->front
+                   >dis-flip--all-basic-words->opposite-side
                    ;; grammar-cards
                    >dis-show-grammar-card
                    cur-grammar-card-info
                    <sub-grammar-card-show?
                    ]
+  ;;
   [:div
-   [search-field "Type Mela basic word, then click on card" >dis-basic-words-search-input-entered]
+   [search-field
+    "Type Mela basic word, then click on card"
+    >dis-basic-words-search-input-entered]
+
    [:div.word-results-row
+
+    [:button.latay-flip-button
+     {:type "submit"
+      :on-click #(>dis-flip-all-basic-words->front)}
+     "All to Front"]
+    [:button.latay-flip-button
+     {:type "submit"
+      :on-click #(>dis-flip--all-basic-words->opposite-side)}
+     "Flip'em All"]
+
     (for [{:keys [id attributes grammar-card]} (find-basic-word basic-words-search-input basic-words)]
       ^{:key id}
       [basic-card-comp

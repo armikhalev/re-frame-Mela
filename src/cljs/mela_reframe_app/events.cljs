@@ -269,3 +269,29 @@
                   (update-in card* [:attributes :flip] not)
                   card*))
               (get-in db [:basic-words])))))
+
+(reg-event-db
+ :flip-all-basic-words->front
+ ;; interceptors
+ [check-spec-interceptor
+  trim-event]
+ ;;
+ (fn [db]
+   (assoc-in db
+             [:basic-words]
+             (map
+              #(update-in % [:attributes] assoc :flip false)
+              (get-in db [:basic-words])))))
+
+(reg-event-db
+ :flip--all-basic-words->opposite-side
+ ;; interceptors
+ [check-spec-interceptor
+  trim-event]
+ ;;
+ (fn [db]
+   (assoc-in db
+             [:basic-words]
+             (map
+              #(update-in % [:attributes :flip] not)
+              (get-in db [:basic-words])))))
