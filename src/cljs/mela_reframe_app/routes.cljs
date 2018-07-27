@@ -1,7 +1,8 @@
 (ns mela-reframe-app.routes
   (:require-macros [secretary.core :refer [defroute]])
-  (:import goog.History)
+  (:import goog.history.Html5History)
   (:require [secretary.core :as secretary]
+            [accountant.core :as accountant]
             [goog.events :as gevents]
             [goog.history.EventType :as EventType]
             [re-frame.core :as re-frame]
@@ -9,7 +10,7 @@
             ))
 
 (defn hook-browser-navigation! []
-  (doto (History.)
+  (doto (Html5History.)
     (gevents/listen
      EventType/NAVIGATE
      (fn [event]
@@ -17,7 +18,7 @@
     (.setEnabled true)))
 
 (defn app-routes []
-  (secretary/set-config! :prefix "#")
+  ;; (secretary/set-config! :prefix "#")
   ;; --------------------
   ;; define routes here
   (defroute "/" []
@@ -32,4 +33,13 @@
   (defroute "/textbook" []
     (re-frame/dispatch [::events/set-active-panel :textbook-panel]))
   ;; --------------------
-  (hook-browser-navigation!))
+  (hook-browser-navigation!)
+  ;;
+  (accountant/configure-navigation!
+   {:nav-handler
+    (fn [path]
+      (secretary/dispatch! path))
+    :path-exists?
+    (fn [path]
+      (secretary/locate-route path))})
+  (accountant/dispatch-current!))

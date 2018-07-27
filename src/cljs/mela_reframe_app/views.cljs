@@ -1,5 +1,6 @@
 (ns mela-reframe-app.views
   (:require [re-frame.core :as re-frame]
+            [accountant.core :as accountant]
             [mela-reframe-app.panels.koyla :refer [koyla-panel]]
             [mela-reframe-app.panels.latay :refer [latay-panel]]
             [mela-reframe-app.subs :as subs :refer [<sub >dis]]
@@ -70,17 +71,19 @@
           "show-menu")}
        [:ul
         ;; Adds new pages to navbar
-        (let [page-links [{:href "#/", :title "Home"}
-                          {:href "#/latay", :title "Basic Words"}
-                          {:href "#/koyla", :title "Translator"}
-                          {:href "#/textbook", :title "Textbook"}]]
+        (let [page-links [{:href "/", :title "Home"}
+                          {:href "/latay", :title "Basic Words"}
+                          {:href "/koyla", :title "Translator"}
+                          {:href "/textbook", :title "Textbook"}]]
           ;;
           (for [pl page-links]
             ^{:key (str (:href pl)"-"(:title pl)"-"panel-name)}
             [:li
              [:a
               {:href (:href pl)
-               :on-click #(>dis-set-show-menu false)}
+               :on-click (do
+                              #(accountant/navigate! pl)
+                              #(>dis-set-show-menu false))}
               (:title pl)]]))]]]
    ;;
    [:main.main-container

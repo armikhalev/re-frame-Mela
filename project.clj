@@ -4,6 +4,7 @@
                  [reagent "0.7.0"]
                  [re-frame "0.10.5"]
                  [secretary "1.2.3"]
+                 [venantius/accountant "0.2.4"]
                  [garden "1.3.5"]
                  [ns-tracker "0.3.1"]
                  [day8.re-frame/http-fx "0.1.6"]
