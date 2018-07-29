@@ -1,6 +1,7 @@
 (ns mela-reframe-app.db
   (:require [re-frame.core :as re-frame]
             [clojure.spec.alpha :as spec]
+            [accountant.core :as accountant]
             [mela-reframe-app.subs :as subs]
             [cljs.pprint :as pp]
             [cljs.analyzer :as analyzer]))
@@ -90,7 +91,7 @@
    :English #(= "English" %)
    :Mela #(= "Mela" %)))
 
-;; coeffects and effects
+;; Effects
 
 (re-frame/reg-fx
  :set-first-letters
@@ -108,3 +109,15 @@
      (do
        (swap! re-frame.db/app-db update-in [:first-letters] empty)
        (swap! re-frame.db/app-db update-in [:words] empty)))))
+
+
+(re-frame/reg-fx
+ :update-url-with-current-koyla-search-input
+ (fn [letter]
+   "Effect handler pushes current 'db :search-input' value to browser history which should be shown in the url bar"
+   (accountant/navigate! (if (-> letter
+                                 count
+                                 (> 0))
+                           (str "koyla?search=" letter)
+                           "koyla"))
+   ))

@@ -128,9 +128,11 @@
                  "las")]
       {:db (assoc-in db [:search-input] letter)
        :dispatch [:request-words lang letter]
+       :update-url-with-current-koyla-search-input letter
        :set-first-letters [cur-lang letter]})
     ;; else
-    {:db (assoc-in db [:search-input] letter)}))
+    {:db (assoc-in db [:search-input] letter)
+     :update-url-with-current-koyla-search-input letter}))
 
 (reg-event-fx
  :search-input-entered

@@ -56,7 +56,7 @@
                   >dis-show-grammar-card
                   (<sub [::subs/grammar-card-show?])]
     :textbook-panel [textbook-panel]
-    [:div]))
+    [:div])) ;; <-- that div sholud be there
 
 (defn show-panel [panel-name]
   [:div.app

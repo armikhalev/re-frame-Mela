@@ -18,7 +18,6 @@
     (.setEnabled true)))
 
 (defn app-routes []
-  ;; (secretary/set-config! :prefix "#")
   ;; --------------------
   ;; define routes here
   (defroute "/" []
