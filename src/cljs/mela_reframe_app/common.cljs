@@ -11,7 +11,7 @@
 ;;   :args (s/cat :value int?))
 
 ;; funcs
-(defn search-field [placeholder >dis-search-input-entered]
+(defn search-field [placeholder >dis-search-input-entered search-input]
   "Pure function: on-change calls passed in function with one value to dispatch"
   ;; spec-it
   (spec-it ::placeholder placeholder)
@@ -19,7 +19,8 @@
   ;;
   [:input.word-filter-input
    {:placeholder placeholder
-    :autoFocus "autoFocus"
+    :auto-focus true
+    :value search-input
     :on-change
     #(>dis-search-input-entered (-> % .-target .-value))}])
 

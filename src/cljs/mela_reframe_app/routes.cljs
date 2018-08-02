@@ -7,7 +7,10 @@
             [goog.history.EventType :as EventType]
             [re-frame.core :as re-frame]
             [mela-reframe-app.events :as events]
-            ))
+            [cljs.pprint :as pp]
+
+            [mela-reframe-app.dispatchers :as disps
+             :refer [>dis-koyla-url-contains-searched-word]]))
 
 (defn hook-browser-navigation! []
   (doto (Html5History.)
@@ -26,8 +29,15 @@
   (defroute "/latay" []
     (re-frame/dispatch [::events/set-active-panel :latay-panel]))
 
-  (defroute "/koyla" []
-    (re-frame/dispatch [::events/set-active-panel :koyla-panel]))
+  (defroute "/koyla" [query-params]
+    (do
+      (when-let [word (:search query-params)]
+        (>dis-koyla-url-contains-searched-word word))
+      (re-frame/dispatch [::events/set-active-panel :koyla-panel])
+      ))
+
+  ;; (defroute "/koyla" []
+  ;;   (re-frame/dispatch [::events/set-active-panel :koyla-panel]))
 
   (defroute "/textbook" []
     (re-frame/dispatch [::events/set-active-panel :textbook-panel]))

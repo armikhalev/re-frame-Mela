@@ -5,39 +5,28 @@
                  [re-frame "0.10.5"]
                  [secretary "1.2.3"]
                  [venantius/accountant "0.2.4"]
-                 [garden "1.3.5"]
                  [ns-tracker "0.3.1"]
                  [day8.re-frame/http-fx "0.1.6"]
                  [cljs-ajax "0.7.3"]]
 
-  :plugins [[lein-cljsbuild "1.1.7"]
-            [lein-garden "0.2.8"]]
+  :plugins [[lein-cljsbuild "1.1.7"]]
 
   :min-lein-version "2.5.3"
 
   :source-paths ["src/clj"]
 
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"
-                                    "test/js"
-                                    "resources/public/css"]
+  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" ]
 
-  :figwheel {:css-dirs ["resources/public/css"]}
-
-  :garden {:builds [{:id           "screen"
-                     :source-paths ["src/clj"]
-                     :stylesheet   mela-reframe-app.css/screen
-                     :compiler     {:output-to     "resources/public/css/screen.css"
-                                    :pretty-print? true}}]}
+  :figwheel {:css-dirs ["resources/public/css"]
+             :ring-handler mela-reframe-app.dev-server/handler}
 
   :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
 
   :aliases {"dev" ["do" "clean"
-                        ["pdo" ["figwheel" "dev"]
-                               ["garden" "auto"]]]
+                        ["pdo" ["figwheel" "dev"] ]]
             "build" ["with-profile" "+prod,-dev" "do"
                           ["clean"]
-                          ["cljsbuild" "once" "min"]
-                          ["garden" "once"]]}
+                          ["cljsbuild" "once" "min"] ]}
 
   :profiles
   {:dev
@@ -59,7 +48,7 @@
      :compiler     {:main                 mela-reframe-app.core
                     :output-to            "resources/public/js/compiled/app.js"
                     :output-dir           "resources/public/js/compiled/out"
-                    :asset-path           "js/compiled/out"
+                    :asset-path           "/js/compiled/out"
                     :source-map-timestamp true
                     :closure-defines      {"re_frame.trace.trace_enabled_QMARK_" true, goog.DEBUG true}
                     :preloads             [day8.re-frame-10x.preload, devtools.preload]

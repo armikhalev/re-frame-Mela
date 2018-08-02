@@ -2,6 +2,12 @@
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.subs :as subs :refer [>dis]]))
 
+;; Common
+
+(defn >dis-koyla-url-contains-searched-word
+  [value]
+  (>dis [:koyla-url-contains-searched-word value]))
+
 ;; Koyla
 
 (defn >dis-search-input-entered

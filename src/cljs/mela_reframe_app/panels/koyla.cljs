@@ -69,7 +69,7 @@
                    <sub-grammar-card-show?]
   [:div
    [:label.koyla-source-label cur-lang]
-   [search-field placeholder >dis-search-input-entered]
+   [search-field placeholder >dis-search-input-entered search-input]
 
    [:div.word-results-row
     [:label.koyla-target-label (if (= cur-lang "English")
@@ -78,6 +78,7 @@
     [:button.koyla-change-button
      {:type "submit"
       :on-click #(>dis-change-lang target-lang)}
+     ;; TODO: Focus on input field
      (if (= cur-lang "English")
        "Change to Mela"
        "Ali tu Engila")]

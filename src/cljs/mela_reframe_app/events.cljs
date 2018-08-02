@@ -25,6 +25,22 @@
  (fn [_ _]
    db/default-db))
 
+(defn handle-koyla-url-contains-searched-word
+  [{db :db} [_ letter]]
+  ;; true
+  (let [cur-lang (:cur-lang db)
+        first-letter (first letter)
+        lang (if (= cur-lang "English")
+               "words"
+               "las")]
+    {:db (assoc-in db [:search-input] letter)
+     :dispatch [:request-words lang first-letter]
+     :set-first-letters [cur-lang first-letter]}))
+
+(reg-event-fx
+ :koyla-url-contains-searched-word
+ handle-koyla-url-contains-searched-word)
+
 (reg-event-db
  ::set-active-panel
  (fn [db [_ active-panel]]
@@ -132,7 +148,8 @@
        :set-first-letters [cur-lang letter]})
     ;; else
     {:db (assoc-in db [:search-input] letter)
-     :update-url-with-current-koyla-search-input letter}))
+     :update-url-with-current-koyla-search-input letter
+     }))
 
 (reg-event-fx
  :search-input-entered
