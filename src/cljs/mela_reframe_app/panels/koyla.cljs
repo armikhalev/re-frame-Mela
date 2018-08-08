@@ -10,8 +10,8 @@
 ;; view
 
 (defn find-word [word dict lang]
-  "Takes 'word' string and 'words' vector of maps that should contain :word key with string."
-  "Returns vector of maps with :word :la :comment keys"
+  "Takes 'word' string and 'dict' vector of maps that should contain :word key with string."
+  "Returns list of maps with :word :la :comment keys"
   ;; spec-it
   (spec-it ::db/word word)
   (spec-it ::db/words dict)

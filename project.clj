@@ -15,7 +15,7 @@
 
   :source-paths ["src/clj"]
 
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" ]
+  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :figwheel {:css-dirs ["resources/public/css"]
              :ring-handler mela-reframe-app.dev-server/handler}
@@ -23,10 +23,10 @@
   :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
 
   :aliases {"dev" ["do" "clean"
-                        ["pdo" ["figwheel" "dev"] ]]
+                   ["pdo" ["figwheel" "dev"]]]
             "build" ["with-profile" "+prod,-dev" "do"
-                          ["clean"]
-                          ["cljsbuild" "once" "min"] ]}
+                     ["clean"]
+                     ["cljsbuild" "once" "min"]]}
 
   :profiles
   {:dev
@@ -38,7 +38,9 @@
     :plugins      [[lein-figwheel "0.5.16"]
                    [lein-doo "0.1.8"]
                    [lein-pdo "0.1.1"]]}
-   :prod { }}
+   :prod {}}
+
+  :doo {:build "test"}
 
   :cljsbuild
   {:builds
@@ -52,8 +54,7 @@
                     :source-map-timestamp true
                     :closure-defines      {"re_frame.trace.trace_enabled_QMARK_" true, goog.DEBUG true}
                     :preloads             [day8.re-frame-10x.preload, devtools.preload]
-                    :external-config      {:devtools/config {:features-to-install :all}}
-                    }}
+                    :external-config      {:devtools/config {:features-to-install :all}}}}
 
     {:id           "min"
      :source-paths ["src/cljs"]
@@ -68,7 +69,7 @@
      :compiler     {:main          mela-reframe-app.runner
                     :output-to     "resources/public/js/compiled/test.js"
                     :output-dir    "resources/public/js/compiled/test/out"
-                    :optimizations :none}}
-    ]}
+                    :optimizations :none
+                    }}
 
-  )
+    ]})
