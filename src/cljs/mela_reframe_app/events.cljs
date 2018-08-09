@@ -8,8 +8,7 @@
             [cljs.pprint :as pp]
             [re-frame.core :refer [reg-event-db reg-event-fx inject-cofx]]))
 
-
-;; now we create an interceptor using `after`
+;; we create an interceptor using `after`
 (def check-spec-interceptor (re-frame/after (partial spec-it ::db/db)))
 
 ;; interceptor

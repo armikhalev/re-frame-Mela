@@ -7,6 +7,7 @@
                  [venantius/accountant "0.2.4"]
                  [ns-tracker "0.3.1"]
                  [day8.re-frame/http-fx "0.1.6"]
+                 [day8.re-frame/test "0.1.5"]
                  [cljs-ajax "0.7.3"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]]
