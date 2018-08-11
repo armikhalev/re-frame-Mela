@@ -1,6 +1,8 @@
 (ns mela-reframe-app.core
   (:require [reagent.core :as reagent]
             [re-frame.core :as re-frame]
+            [cljs.spec.alpha :as cljs-s]
+            [cljs.spec.test.alpha :as cljs-stest]
             [mela-reframe-app.events :as events]
             [mela-reframe-app.routes :as routes]
             [mela-reframe-app.views :as views]
@@ -24,3 +26,5 @@
   (re-frame/dispatch [:request-basic-words])
   (dev-setup)
   (mount-root))
+
+;; (cljs-stest/instrument)

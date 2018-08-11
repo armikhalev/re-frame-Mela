@@ -3,27 +3,24 @@
             [reagent.dom :as reagent-dom]
             [reagent.core :as reagent]
             [mela-reframe-app.db :as db :refer [spec-it]]
-            [clojure.spec.alpha :as s]
+            [cljs.spec.alpha :as s]
+            [cljs.spec.test.alpha :as stest]
             [cljs.pprint :as pp]))
 
-;; Specs
-
-(s/def ::placeholder string?)
-;; TODO: figure out how spec works with functions passed as argument
-;; (s/fdef >dis-search-input-entered
-;;   :args (s/cat :value int?))
 
 ;; Components
+(defn sanitize-input [input]
+  (let [sanitized (re-find #"^[a-zA-Z0-9'-]+" input)]
+    (if (some? sanitized)
+      sanitized
+      ""))
+  )
 
 (defn search-field
   "Pure function: on-change calls passed in function with one value to dispatch"
   [placeholder
    >dis-search-input-entered
    search-input]
-  ;; spec-it
-  (spec-it ::placeholder placeholder)
-  ;; (spec-it ::dis-search-input-entered >dis-search-input-entered)
-  ;;
   (let []
     (reagent/create-class
      {:display-name "search-field"
@@ -47,7 +44,14 @@
          {:placeholder placeholder
           :auto-focus true
           :value search-input
-          :on-change #(>dis-search-input-entered (-> % .-target .-value))}])})))
+          :on-change #(>dis-search-input-entered (sanitize-input (-> % .-target .-value)))}])})))
+
+;; spec
+(s/fdef search-field
+  :args (s/cat :placeholder string?
+               :>dis-search-input-entered (s/fspec :args (s/cat :value string?))
+               :search-input string?))
+;; ENDs spec
 
 (defn text-book-comp
   [{:keys [title body comment] :as args}
@@ -73,3 +77,4 @@
     [:div
      [:strong "Comment: "]
      comment]]])
+

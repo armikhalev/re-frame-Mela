@@ -8,10 +8,11 @@
 
 ;; SPECS
 
+;; TODO: make printing line of the file to work!
 (defmacro add-meta [expr]
   (let [namespace {:namespace (name analyzer/*cljs-ns*)}
         source-details (meta &form)]
-    `(with-meta ~expr '~(merge namespace source-details)))) 
+    `(with-meta ~expr '~(merge namespace source-details))))
 
 ;; Koyla specs
 
@@ -28,7 +29,7 @@
 (spec/def ::card (spec/keys :req-un [::word ::la ::comment]))
 (spec/def ::words (spec/coll-of ::card))
 
-;; Latay specs 
+;; Latay specs
 
 (spec/def ::id string?)
 (spec/def ::front string?)

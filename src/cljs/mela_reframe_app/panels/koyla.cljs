@@ -16,9 +16,14 @@
   (spec-it ::db/word word)
   (spec-it ::db/words dict)
   ;;
-  (let [key-search-by (if (= lang "English") :word :la)]
+  (let [key-search-by (if (= lang "English") :word :la)
+
+        ;; sanitize input to prevent runtime error on wrong patterns
+        word-sanitized (re-find #"^[a-zA-Z0-9'-]+" word)
+        word* (if (some? word-sanitized) word-sanitized "")] 
+      ;;
       (filter
-       #(re-find (re-pattern word) (key-search-by %))
+       #(re-find (re-pattern word*) (key-search-by %))
        dict)))
 
 ;; Cards
@@ -78,7 +83,6 @@
     [:button.koyla-change-button
      {:type "submit"
       :on-click #(>dis-change-lang target-lang)}
-     ;; TODO: Focus on input field
      (if (= cur-lang "English")
        "Change to Mela"
        "Ali tu Engila")]
