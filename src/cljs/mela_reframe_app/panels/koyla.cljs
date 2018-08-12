@@ -2,7 +2,8 @@
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.db :as db :refer [spec-it]]
             [mela-reframe-app.common :as common :refer [search-field
-                                                        text-book-comp]]
+                                                        text-book-comp
+                                                        sanitize-input]]
             [clojure.spec.alpha :as spec]
             [cljs.pprint :as pp]
             [mela-reframe-app.subs :as subs :refer [>dis]]))
@@ -16,16 +17,13 @@
   (spec-it ::db/word word)
   (spec-it ::db/words dict)
   ;;
-  (let [key-search-by (if (= lang "English") :word :la)
-
-        ;; sanitize input to prevent runtime error on wrong patterns
-        word-sanitized (re-find #"^[a-zA-Z0-9'-]+" word)
-        word* (if (some? word-sanitized) word-sanitized "")] 
-      ;;
+  (let [key-search-by (if (= lang "English") :word :la)]
       (filter
-       #(re-find (re-pattern word*) (key-search-by %))
+       #(re-find
+         (re-pattern (sanitize-input word))
+         (key-search-by %))
        dict)))
-
+()
 ;; Cards
 
 (defn english-card-comp
@@ -74,7 +72,11 @@
                    <sub-grammar-card-show?]
   [:div
    [:label.koyla-source-label cur-lang]
-   [search-field placeholder >dis-search-input-entered search-input]
+   [search-field
+
+    placeholder
+    >dis-search-input-entered
+    search-input]
 
    [:div.word-results-row
     [:label.koyla-target-label (if (= cur-lang "English")

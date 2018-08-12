@@ -1,7 +1,8 @@
 (ns mela-reframe-app.panels.latay
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.common :as common :refer [search-field
-                                                        text-book-comp]]
+                                                        text-book-comp
+                                                        sanitize-input]]
             [mela-reframe-app.db :as db :refer [spec-it]]
             [clojure.spec.alpha :as spec]
             [cljs.pprint :as pp]
@@ -14,9 +15,11 @@
   "Returns vector of maps that have 'word' as value of 'word [:attributes :front]'"
   (spec-it ::db/front word)
   (spec-it ::db/basic-words dict)
+  ;;
   (filter
    #(re-find
-     (re-pattern word) (clojure.string/lower-case (get-in % [:attributes :front])))
+     (re-pattern (sanitize-input word))
+     (clojure.string/lower-case (get-in % [:attributes :front])))
    dict))
 
 (defn basic-card-comp
@@ -62,7 +65,8 @@
   [:div
    [search-field
     "Type Mela basic word, then click on card"
-    >dis-basic-words-search-input-entered]
+    >dis-basic-words-search-input-entered
+    basic-words-search-input]
 
    [:div.word-results-row
 

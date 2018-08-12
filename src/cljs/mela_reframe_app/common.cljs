@@ -13,8 +13,7 @@
   (let [sanitized (re-find #"^[a-zA-Z0-9'-]+" input)]
     (if (some? sanitized)
       sanitized
-      ""))
-  )
+      "")))
 
 (defn search-field
   "Pure function: on-change calls passed in function with one value to dispatch"
