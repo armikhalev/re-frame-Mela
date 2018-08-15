@@ -9,8 +9,9 @@
 
 
 ;; Components
+
 (defn sanitize-input [input]
-  (let [sanitized (re-find #"^[a-zA-Z0-9'-]+" input)]
+  (let [sanitized (re-find #"[a-zA-Z0-9'-]*\s*[a-zA-Z0-9'-]*" input)]
     (if (some? sanitized)
       sanitized
       "")))

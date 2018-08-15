@@ -27,4 +27,4 @@
   (dev-setup)
   (mount-root))
 
-(cljs-stest/instrument)
+;; (cljs-stest/instrument)

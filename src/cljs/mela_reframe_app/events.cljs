@@ -1,6 +1,7 @@
 (ns mela-reframe-app.events
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.db :as db :refer [spec-it]]
+            [mela-reframe-app.common :as common :refer [sanitize-input]]
             [cljs.spec.alpha :as spec]
             [mela-reframe-app.subs :as subs :refer [<sub >dis]]
             [ajax.core :as ajax]
@@ -110,23 +111,26 @@
   [trim-event]
   (fn
     [db [response]]
-    (js/console.log response)))
+    (do
+      (js/console.log "Badly handled: -> " response)
+      db)))
 
 ;; Api response event handler
 (reg-event-fx
  :request-words
  (fn [{db :db} [_ lang first-letter]]     ;; <-- 1st argument is coeffect, from which we extract db
    ;; we return a map of (side) effects
-   {:http-xhrio {:method          :get
-                 :api (js/XMLHttpRequest.)
-                 :headers {"Accept" "application/vnd.api+json"}
-                 :uri             (str "http://melasi.pythonanywhere.com/koyla/"
-                                       lang ;; words - english / las - mela
-                                       "?letter="
-                                       first-letter)
-                 :response-format (ajax/json-response-format {:keywords? true})
-                 :on-success      [:process-request-words-response]
-                 :on-failure      [:bad-response]}}))
+   (let [sanitized-letter (sanitize-input first-letter)]
+     {:http-xhrio {:method          :get
+                   :api (js/XMLHttpRequest.)
+                   :headers {"Accept" "application/vnd.api+json"}
+                   :uri             (str "http://melasi.pythonanywhere.com/koyla/"
+                                         lang ;; words - english / las - mela
+                                         "?letter="
+                                         sanitized-letter)
+                   :response-format (ajax/json-response-format {:keywords? true})
+                   :on-success      [:process-request-words-response]
+                   :on-failure      [:bad-response]}})))
 
 (defn handle-search-input-entered
   [{db :db} [_ letter]]
