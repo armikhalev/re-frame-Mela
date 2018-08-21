@@ -4,20 +4,24 @@
             [reagent.core :as reagent]
             [mela-reframe-app.db :as db :refer [spec-it]]
             [cljs.spec.alpha :as s]
-            [cljs.spec.test.alpha :as stest]
             [cljs.pprint :as pp]))
-
 
 ;; Components
 
-(defn sanitize-input [input]
+(defn sanitize-input
+  "Ensures that `input` string is alphanumeric, apostroph, dash or space.
+  Otherwise returns empty string."
+  [input]
   (let [sanitized (re-find #"[a-zA-Z0-9'-]*\s*[a-zA-Z0-9'-]*" input)]
     (if (some? sanitized)
       sanitized
       "")))
 
 (defn search-field
-  "Pure function: on-change calls passed in function with one value to dispatch"
+  "Pure function: `on-change` calls passed in function with one value to dispatch.
+  `placeholder` string.
+  `>dis-search-input-entered` function, `re-frame` dispatch handler.
+  `search-input` string, current value that will be replaced by `on-change` event."
   [placeholder
    >dis-search-input-entered
    search-input]
@@ -48,9 +52,9 @@
 
 ;; spec
 (s/fdef search-field
-  :args (s/cat :placeholder string?
-               :>dis-search-input-entered (s/fspec :args (s/cat :value string?))
-               :search-input string?))
+        :args (s/cat :placeholder string?
+                     :>dis-search-input-entered (s/fspec :args (s/cat :value string?))
+                     :search-input string?))
 ;; ENDs spec
 
 (defn text-book-comp

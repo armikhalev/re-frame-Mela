@@ -8,6 +8,7 @@
             [mela-reframe-app.views :as views]
             [mela-reframe-app.config :as config]))
 
+
 (defn dev-setup []
   (when config/debug?
     (enable-console-print!)
@@ -27,4 +28,5 @@
   (dev-setup)
   (mount-root))
 
-;; (cljs-stest/instrument)
+; (cljs-stest/instrument)
+

@@ -2,3 +2,8 @@
 /target
 /*-init.clj
 out
+node_modules
+.lein-failures
+.lein-repl-history
+.rebel_readline_history
+*.js

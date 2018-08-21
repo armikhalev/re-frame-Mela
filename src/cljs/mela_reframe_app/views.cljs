@@ -4,6 +4,7 @@
             [mela-reframe-app.panels.koyla :refer [koyla-panel]]
             [mela-reframe-app.panels.latay :refer [latay-panel]]
             [mela-reframe-app.subs :as subs :refer [<sub >dis]]
+            [cljs.spec.alpha :as spec]
             [mela-reframe-app.dispatchers :as disps
              :refer [>dis-search-input-entered
                      >dis-basic-words-search-input-entered
@@ -14,7 +15,6 @@
                      >dis-flip-all-basic-words->front
                      >dis-flip--all-basic-words->opposite-side
                      >dis-flip-card]]))
-
 
 ;; home
 (defn home-panel []

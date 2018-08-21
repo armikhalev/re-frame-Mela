@@ -4,7 +4,7 @@
                                                         text-book-comp
                                                         sanitize-input]]
             [mela-reframe-app.db :as db :refer [spec-it]]
-            [clojure.spec.alpha :as spec]
+            [cljs.spec.alpha :as spec]
             [cljs.pprint :as pp]
             [mela-reframe-app.subs :as subs :refer [>dis]]))
 

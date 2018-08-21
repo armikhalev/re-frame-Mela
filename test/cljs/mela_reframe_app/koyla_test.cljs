@@ -37,3 +37,16 @@
             test-data
             "English")))))
 
+(deftest english-card-comp-test
+  (testing
+      "english-card-comp returns vector built out of "
+    (is (=
+         [:ul.koyla-result-ul
+          [:li [:strong "English: "] "choice"]
+          [:li [:strong "Mela: "] "kifesu"]
+          [:li [:strong "Comment: "] "ki+fe+su; one out of many"] nil]
+
+           (koyla/english-card-comp
+            (first test-data)
+            (fn [val] val)
+            )))))

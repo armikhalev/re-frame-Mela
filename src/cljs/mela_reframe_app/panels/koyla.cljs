@@ -4,7 +4,7 @@
             [mela-reframe-app.common :as common :refer [search-field
                                                         text-book-comp
                                                         sanitize-input]]
-            [clojure.spec.alpha :as spec]
+            [cljs.spec.alpha :as spec]
             [cljs.pprint :as pp]
             [mela-reframe-app.subs :as subs :refer [>dis]]))
 
@@ -23,7 +23,7 @@
          (re-pattern (sanitize-input word))
          (key-search-by %))
        dict)))
-()
+
 ;; Cards
 
 (defn english-card-comp
@@ -108,4 +108,3 @@
     cur-grammar-card-info
     >dis-show-grammar-card
     <sub-grammar-card-show?]])
-

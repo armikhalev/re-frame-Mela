@@ -6,6 +6,7 @@
             [mela-reframe-app.subs :as subs :refer [<sub >dis]]
             [ajax.core :as ajax]
             [day8.re-frame.http-fx]
+            [day8.re-frame.tracing :refer-macros [fn-traced defn-traced]]
             [cljs.pprint :as pp]
             [re-frame.core :refer [reg-event-db reg-event-fx inject-cofx]]))
 
@@ -20,14 +21,16 @@
               (let [trim-fn (fn [event] (-> event rest vec))]
                 (update-in context [:coeffects :event] trim-fn)))))
 
+
 (reg-event-db
  ::initialize-db
- (fn [_ _]
+ (fn-traced [_ _]
    db/default-db))
 
-(defn handle-koyla-url-contains-searched-word
+
+(defn-traced handle-koyla-url-contains-searched-word
+  "Event handler"
   [{db :db} [_ letter]]
-  ;; true
   (let [cur-lang (:cur-lang db)
         first-letter (first letter)
         lang (if (= cur-lang "English")
@@ -37,19 +40,20 @@
      :dispatch [:request-words lang first-letter]
      :set-first-letters [cur-lang first-letter]}))
 
+
 (reg-event-fx
  :koyla-url-contains-searched-word
  handle-koyla-url-contains-searched-word)
 
 (reg-event-db
  ::set-active-panel
- (fn [db [_ active-panel]]
+ (fn-traced [db [_ active-panel]]
    (assoc db :active-panel active-panel)))
 
 (reg-event-db
  :set-show-menu
  [trim-event]
- (fn [db [set-show-menu]]
+ (fn-traced [db [set-show-menu]]
    ;; spec
    (spec/valid? boolean? set-show-menu)
    ;;
@@ -63,14 +67,16 @@
 (reg-event-db
  :change-lang
  [trim-event]
- (fn [db [cur-lang]]
+ (fn-traced [db [cur-lang]]
    (assoc db :cur-lang cur-lang)))
 
 ;; WORDS CARDS HANDLERS
 
 ;; helper
-(defn reduce-words-response [response]
+(defn reduce-words-response
   "Helper fn used in filter-response & :process-response event-handler"
+  [response]
+
   (reduce (fn [acc data]
             (as-> data d
               (:id d)
@@ -102,14 +108,14 @@
   trim-event
   filter-words-response]
  ;; don't need to destructure response, since it is done in filter-response interceptor
- (fn [db response]
+ (fn-traced [db response]
    (assoc-in db [:words]
               (js->clj response))))
 
  (reg-event-db
   :bad-response
   [trim-event]
-  (fn
+  (fn-traced
     [db [response]]
     (do
       (js/console.log "Badly handled: -> " response)
@@ -118,7 +124,7 @@
 ;; Api response event handler
 (reg-event-fx
  :request-words
- (fn [{db :db} [_ lang first-letter]]     ;; <-- 1st argument is coeffect, from which we extract db
+ (fn-traced [{db :db} [_ lang first-letter]]     ;; <-- 1st argument is coeffect, from which we extract db
    ;; we return a map of (side) effects
    (let [sanitized-letter (sanitize-input first-letter)]
      {:http-xhrio {:method          :get
@@ -162,7 +168,7 @@
 
 (reg-event-db
  :show-grammar-card
- (fn [db [_ show?]]
+ (fn-traced [db [_ show?]]
    (assoc db :grammar-card-show? show?)))
 
 ;; interceptor
@@ -183,11 +189,11 @@
   trim-event
   add-grammar-cards-to-db]
  ;;
- (fn [db response] db))
+ (fn-traced [db response] db))
 
 (reg-event-fx
  :request-grammar-cards
- (fn [{:keys [db]} _]
+ (fn-traced [{:keys [db]} _]
    ;; we return a map of (side) effects
    {:http-xhrio {:method          :get
                  :api (js/XMLHttpRequest.)
@@ -209,7 +215,7 @@
  ;; interceptors
  [show-grammar-card]
  ;;
- (fn [db [_ id]]
+ (fn-traced [db [_ id]]
    (assoc-in db [:cur-grammar-card-info]
              (get-in (->> (:grammar-cards db)
                           (filter #(= id (:id %)))
@@ -253,11 +259,11 @@
   trim-event
   add-basic-words-to-db]
  ;;
- (fn [db response] db))
+ (fn-traced [db response] db))
 
 (reg-event-fx
  :request-basic-words
- (fn [{:keys [db]} _]
+ (fn-traced [{:keys [db]} _]
    ;; we return a map of (side) effects
    {:http-xhrio {:method          :get
                  :api (js/XMLHttpRequest.)
@@ -273,7 +279,7 @@
  [check-spec-interceptor
   trim-event]
  ;;
- (fn [db [letter]]
+ (fn-traced [db [letter]]
    (assoc-in db [:basic-words-search-input] letter)))
 
 (reg-event-db
@@ -282,7 +288,7 @@
  [check-spec-interceptor
   trim-event]
  ;;
- (fn [db [flip? id]]
+ (fn-traced [db [flip? id]]
    (assoc-in db
              [:basic-words]
              (map
@@ -298,7 +304,7 @@
  [check-spec-interceptor
   trim-event]
  ;;
- (fn [db]
+ (fn-traced [db]
    (assoc-in db
              [:basic-words]
              (map
@@ -311,7 +317,7 @@
  [check-spec-interceptor
   trim-event]
  ;;
- (fn [db]
+ (fn-traced [db]
    (assoc-in db
              [:basic-words]
              (map
