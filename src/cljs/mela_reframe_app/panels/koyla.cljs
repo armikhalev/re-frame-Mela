@@ -1,28 +1,35 @@
 (ns mela-reframe-app.panels.koyla
+  #:ghostwheel.core{:check     true
+                    :num-tests 100}
   (:require [re-frame.core :as re-frame]
-            [mela-reframe-app.db :as db :refer [spec-it]]
+            [mela-reframe-app.db :as db]
             [mela-reframe-app.common :as common :refer [search-field
                                                         text-book-comp
                                                         sanitize-input]]
-            [cljs.spec.alpha :as spec]
+            [cljs.spec.alpha :as s]
+            [ghostwheel.core :as g
+             :refer [>defn >defn- >fdef => | <- ?]]
             [cljs.pprint :as pp]
             [mela-reframe-app.subs :as subs :refer [>dis]]))
 
-;; view
+;; Helper
 
-(defn find-word [word dict lang]
-  "Takes 'word' string and 'dict' vector of maps that should contain :word key with string."
-  "Returns list of maps with :word :la :comment keys"
-  ;; spec-it
-  (spec-it ::db/word word)
-  (spec-it ::db/words dict)
-  ;;
-  (let [key-search-by (if (= lang "English") :word :la)]
-      (filter
-       #(re-find
-         (re-pattern (sanitize-input word))
-         (key-search-by %))
-       dict)))
+(>defn ^::g/outstrument find-word
+       "Takes 'word' string and 'dict' vector of maps that should contain :word key with string.
+       Returns list of maps with :word :la :comment keys"
+       [word dict lang]
+       ;; spec-it
+       [::db/word ::db/words string?
+        => (s/coll-of ::db/card :kind seq?) ]
+       ;;
+       (let [key-search-by (if (= lang "English") :word :la)]
+         (filter
+          #(re-find
+            (re-pattern (sanitize-input word))
+            (key-search-by %))
+          dict)))
+
+;; (g/check)
 
 ;; Cards
 
@@ -108,3 +115,4 @@
     cur-grammar-card-info
     >dis-show-grammar-card
     <sub-grammar-card-show?]])
+

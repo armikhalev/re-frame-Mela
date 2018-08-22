@@ -1,11 +1,11 @@
 (defproject mela-reframe-app "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.10.238"]
-                 [org.clojure/test.check "0.9.0"]
                  [reagent "0.7.0"]
                  [re-frame "0.10.5"]
                  [secretary "1.2.3"]
                  [venantius/accountant "0.2.4"]
+                 [gnl/ghostwheel "0.2.3"]
                  [ns-tracker "0.3.1"]
                  [day8.re-frame/http-fx "0.1.6"]
                  [day8.re-frame/test "0.1.5"]
@@ -60,7 +60,8 @@
                                            "day8.re_frame.tracing.trace_enabled_QMARK_"  true,
                                            goog.DEBUG true}
                     :preloads             [day8.re-frame-10x.preload, devtools.preload]
-                    :external-config      {:devtools/config {:features-to-install [:formatters :hints]}}}}
+                    :external-config      {:ghostwheel {}
+                                           :devtools/config {:features-to-install [:formatters :hints]}}}}
 
     {:id           "min"
      :source-paths ["src/cljs"]

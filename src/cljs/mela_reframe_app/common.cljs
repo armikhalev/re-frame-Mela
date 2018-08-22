@@ -1,21 +1,30 @@
 (ns mela-reframe-app.common
+  #:ghostwheel.core{:check     true
+                    :num-tests 100}
   (:require [re-frame.core :as re-frame]
             [reagent.dom :as reagent-dom]
             [reagent.core :as reagent]
             [mela-reframe-app.db :as db :refer [spec-it]]
             [cljs.spec.alpha :as s]
+            [ghostwheel.core :as g
+             :refer [>defn >defn- >fdef => | <- ?]]
             [cljs.pprint :as pp]))
+
 
 ;; Components
 
-(defn sanitize-input
+
+(>defn sanitize-input
   "Ensures that `input` string is alphanumeric, apostroph, dash or space.
   Otherwise returns empty string."
   [input]
+  [string?
+   => string?]
   (let [sanitized (re-find #"[a-zA-Z0-9'-]*\s*[a-zA-Z0-9'-]*" input)]
     (if (some? sanitized)
       sanitized
       "")))
+
 
 (defn search-field
   "Pure function: `on-change` calls passed in function with one value to dispatch.
@@ -82,3 +91,5 @@
      [:strong "Comment: "]
      comment]]])
 
+
+(g/check)
