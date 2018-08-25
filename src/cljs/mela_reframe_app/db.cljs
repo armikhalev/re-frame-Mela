@@ -8,11 +8,6 @@
 
 ;; SPECS
 
-;; TODO: make printing line of the file to work!
-(defmacro add-meta [expr]
-  (let [namespace {:namespace (name analyzer/*cljs-ns*)}
-        source-details (meta &form)]
-    `(with-meta ~expr '~(merge namespace source-details))))
 
 ;; Koyla specs
 
@@ -41,20 +36,31 @@
 
 (spec/def ::basic-words (spec/coll-of ::basic-word-card))
 
-;; Common
 
-(spec/def ::db (spec/keys :req-un [::words ::basic-words]))
+;; Grammar cards
+(spec/def ::type string?)
+(spec/def ::data (spec/nilable (spec/keys :opt-un [::type ::id])))
+
+(spec/def ::grammar-card (spec/nilable (spec/keys :opt-un [::data])))
+
+
+;; Common
+(spec/def ::show-menu? boolean?)
+(spec/def ::db (spec/keys :req-un [::words ::basic-words ::show-menu?]))
+
+
 
 (defn spec-it
   "Throws an exception if `value` doesn't match the Spec `a-spec`."
   [a-spec value]
-  (meta (add-meta
-         (when-not (spec/valid? a-spec value)
-           (prn "spec check failed: =>" )
-           (println)
-           (pp/pprint (spec/explain a-spec value))))))
+  (when-not (spec/valid? a-spec value)
+    (prn "spec check failed: =>" )
+    (println)
+    (pp/pprint (spec/explain a-spec value))))
+
 
 ;; DB
+
 
 (def default-db
   {;; Common
