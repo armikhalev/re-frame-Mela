@@ -95,34 +95,57 @@
 ;; WORD CARDS HANDLERS
 
 
-;; reduce-words-response `response` arg
-(s/def ::id string?)
-(s/def ::attributes ::db/card)
-(s/def ::relationships (s/keys :req-un [::db/grammar-card]))
-(s/def ::word-card (s/keys :req-un [::id ::attributes ::relationships]))
-(s/def ::word-cards (s/coll-of ::word-card))
+;; --> Starts: process-request-words-response
 
-;; reduce-words-response => should return
-(s/def ::handled-word-card (s/keys :req-un [::db/word ::db/la ::db/comment ::db/grammar-card ::db/id]))
-(s/def ::handled-word-cards (s/coll-of ::handled-word-card))
+
+(s/def :context/card (s/keys :req-un [::db/word ::db/la ::db/comment]))
+(s/def :context/attributes :context/card)
+
+(s/def :context/relationships (s/keys :req-un [::db/grammar-card]))
+
+(s/def :context/word-card (s/keys :req-un [::db/id :context/attributes :context/relationships]))
+(s/def :context/data (s/coll-of :context/word-card))
+(s/def :context/effect (s/keys :req-un [:context/data]))
+(s/def :context/event (s/coll-of :context/effect))
+(s/def :context/coeffects (s/keys :req-un [:context/event ::db/db]))
+(s/def :context/context (s/keys :req-un [:context/coeffects]))
+
+(s/def :response/handled-word-card (s/keys :req-un [::db/word ::db/la ::db/comment ::db/grammar-card ::db/id]))
+(s/def :response/handled-word-cards (s/coll-of :response/handled-word-card))
+
+(s/def :response/event (s/coll-of :response/handled-word-card))
+(s/def :response/coeffects (s/keys :req-un [:response/event]))
+(s/def :response/response (s/keys :req-un [:response/coeffects]))
 
 (>defn reduce-words-response
   "Helper fn used in :filter-words-response interceptor.
    Adds `:id` and `:grammar-card` attributes to `:words`."
   [response]
-  [::word-cards
-   => ::handled-word-cards]
+  [:context/data
+   => :response/handled-word-cards]
   (reduce (fn [acc data]
-                      (as-> data d
-                        (:id d)
-                        (assoc (:attributes data) :id d)
-                        (assoc d :grammar-card
-                               (get-in data [:relationships :grammar-card :data],
-                                       {})) ;; otherwise return empty map
-                        (conj acc d)))
-                    []
-                    response))
+            (as-> data d
+              (:id d)
+              (assoc (:attributes data) :id d)
+              (assoc d :grammar-card
+                     (get-in data [:relationships :grammar-card :data],
+                             {})) ;; otherwise return empty map
+              (conj acc d)))
+          []
+          response))
 
+
+(>defn before-filter-words-response-interceptor
+  "Fn used in `:before` of `filter-words-response` interceptor"
+  [context]
+  [:context/context
+   => :response/response]
+  (let [response (set (reduce-words-response (-> context
+                                                 (get-in , [:coeffects :event])
+                                                 first
+                                                 (:data))))
+        words (set (get-in context [:coeffects :db :words]))]
+    (assoc-in context [:coeffects :event] (into [] (clojure.set/union words response)))))
 
 
 ;; interceptor
@@ -130,13 +153,7 @@
   "Filter out data that is already present in db"
   (re-frame.core/->interceptor
    :id     :filter-words-response
-   :before (fn [context]
-             (let [response (set (reduce-words-response (-> context
-                                                            (get-in , [:coeffects :event])
-                                                            first
-                                                            (:data))))
-                   words (set (get-in context [:coeffects :db :words]))]
-               (assoc-in context [:coeffects :event] (into [] (clojure.set/union words response)))))))
+   :before before-filter-words-response-interceptor))
 
 
 ;; Process response from 'request-words' event-fx
@@ -150,6 +167,9 @@
  (fn-traced [db response]
             (assoc-in db [:words]
                       (js->clj response))))
+
+
+;; <-- Ends: process-request-words-response
 
 
 (reg-event-db

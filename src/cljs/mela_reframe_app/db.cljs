@@ -9,6 +9,15 @@
 ;; SPECS
 
 
+(spec/def ::id string?)
+
+;; Grammar cards
+(spec/def ::type string?)
+(spec/def ::data (spec/nilable (spec/keys :opt-un [::type ::id])))
+
+(spec/def ::grammar-card (spec/nilable (spec/keys :opt-un [::data])))
+
+
 ;; Koyla specs
 
 (spec/def ::word string?)
@@ -21,12 +30,11 @@
 (spec/def ::comment string?)
 (spec/def ::cur-grammar-card-info (spec/keys :req-un [::title ::body ::comment] ))
 
-(spec/def ::card (spec/keys :req-un [::word ::la ::comment]))
+(spec/def ::card (spec/keys :req-un [::word ::la ::comment ::grammar-card ::id]))
 (spec/def ::words (spec/coll-of ::card))
 
 ;; Latay specs
 
-(spec/def ::id string?)
 (spec/def ::front string?)
 (spec/def ::back string?)
 (spec/def ::flip boolean?)
@@ -37,17 +45,9 @@
 (spec/def ::basic-words (spec/coll-of ::basic-word-card))
 
 
-;; Grammar cards
-(spec/def ::type string?)
-(spec/def ::data (spec/nilable (spec/keys :opt-un [::type ::id])))
-
-(spec/def ::grammar-card (spec/nilable (spec/keys :opt-un [::data])))
-
-
 ;; Common
 (spec/def ::show-menu? boolean?)
 (spec/def ::db (spec/keys :req-un [::words ::basic-words ::show-menu?]))
-
 
 
 (defn spec-it
