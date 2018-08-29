@@ -34,7 +34,6 @@
   {:dev
    {:dependencies [[binaryage/devtools "0.9.10"]
                    [figwheel-sidecar "0.5.16"]
-                   [day8.re-frame/tracing "0.5.1"]
                    [cider/piggieback "0.3.1"]
                    [day8.re-frame/re-frame-10x "0.3.3"]]
 
@@ -42,7 +41,7 @@
                    [lein-doo "0.1.8"]
                    [lein-pdo "0.1.1"]]}
    :prod {
-          :dependencies [[day8.re-frame/tracing-stubs "0.5.1"]]}}
+          :dependencies []}}
 
   :doo {:build "test"}
 

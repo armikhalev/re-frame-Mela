@@ -34,6 +34,7 @@
 (>defn search-field
   "Pure function: `on-change` calls passed in function with one value to dispatch.
   `search-input` string, current value that will be replaced by `on-change` event."
+  ;; {::g/trace 4}
   [placeholder
    >dis-search-input-entered
    search-input]

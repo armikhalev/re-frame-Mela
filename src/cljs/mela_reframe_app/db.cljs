@@ -71,8 +71,8 @@
 
    :grammar-cards           [],
 
-   :first-letters           {"Mela" [],
-                             "English" ["a"]}, ;; since it is called on the first render
+   :first-letters           {"Mela" #{}, ;; sets ensures that there is only one such letter
+                             "English" #{"a"} }, ;; since it is called on the first render
 
    :cur-lang                "English"
 
@@ -99,7 +99,6 @@
    :Mela #(= "Mela" %)))
 
 ;; Effects
-
 (re-frame/reg-fx
  :set-first-letters
  (fn [[lang letter]] ;; destructure
@@ -122,9 +121,20 @@
  :update-url-with-current-koyla-search-input
  (fn [letter]
    "Effect handler pushes current 'db :search-input' value to browser history which should be shown in the url bar"
-   (accountant/navigate! (if (-> letter
-                                 count
-                                 (> 0))
-                           (str "koyla?search=" letter)
-                           "koyla"))
-   ))
+   (let [cur-lang @(re-frame/subscribe [::subs/cur-lang])
+         mela-cur? (if (= cur-lang "Mela") true false)]
+
+     (accountant/navigate! (if (-> letter
+                                   count
+                                   (> 0))
+                             (str "koyla?"
+                                  (if mela-cur?
+                                    "lang=mela&"
+                                    "lang=english&")
+                                  "search=" letter)
+                             "koyla")))))
+
+(re-frame/reg-fx
+ :set-cur-lang
+ (fn [lang]
+   (swap! re-frame.db/app-db assoc :cur-lang lang)))

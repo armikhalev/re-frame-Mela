@@ -5,8 +5,8 @@
 ;; Common
 
 (defn >dis-koyla-url-contains-searched-word
-  [value]
-  (>dis [:koyla-url-contains-searched-word value]))
+  [lang word]
+  (>dis [:koyla-url-contains-searched-word lang word]))
 
 ;; Koyla
 

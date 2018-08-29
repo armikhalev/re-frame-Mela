@@ -7,7 +7,6 @@
             [mela-reframe-app.subs :as subs :refer [<sub >dis]]
             [ajax.core :as ajax]
             [day8.re-frame.http-fx]
-            [day8.re-frame.tracing :refer-macros [fn-traced defn-traced]]
             [clojure.spec.alpha :as s]
             [ghostwheel.core :as g
              :refer [>defn >defn- >fdef => | <- ?]]
@@ -30,22 +29,36 @@
 
 (reg-event-db
  ::initialize-db
- (fn-traced [_ _]
+ (fn [_ _]
    db/default-db))
 
 
-(defn-traced handle-koyla-url-contains-searched-word
-  "Event handler"
-  [{db :db} [_ letter]]
-  (let [cur-lang (:cur-lang db)
-        first-letter (first letter)
-        lang (if (= cur-lang "English")
-               "words"
-               "las")]
-    {:db (assoc-in db [:search-input] letter)
-     :dispatch [:request-words lang first-letter]
+(defn handle-koyla-url-contains-searched-word
+  "Event handler.
+  Requires as args `db`,
+  `lang` string, which either `mela` or `english`,
+  `letter` string of any length.
+  Requests api for Mela word if `lang` is `mela`, otherwise requests  English words.
+  Sets first-letter of the `letter` to `first-letters` in `db` to the relevant language."
+
+  ;; {::g/trace 4}
+  [{db :db} [_ lang word]]
+  ;; spec
+  ;; [::db/db vector? | #(string? lang)
+  ;;  => ::db/db]
+  ;;
+  (let [first-letter (first word)
+        cur-lang     (clojure.string/capitalize lang)
+        lang-req     (if (= lang "mela")
+                       "las"
+                       "words")]
+
+    {:db (assoc-in db [:search-input] word)
+     :dispatch [:request-words lang-req first-letter]
+     :set-cur-lang cur-lang
      :set-first-letters [cur-lang first-letter]}))
 
+;; (g/check)
 
 (reg-event-fx
  :koyla-url-contains-searched-word
@@ -54,7 +67,7 @@
 
 (reg-event-db
  ::set-active-panel
- (fn-traced [db [_ active-panel]]
+ (fn [db [_ active-panel]]
    (assoc db :active-panel active-panel)))
 
 
@@ -164,7 +177,7 @@
   trim-event
   filter-words-response]
  ;; don't need to destructure response, since it is done in filter-words-response interceptor
- (fn-traced [db response]
+ (fn [db response]
             (assoc-in db [:words]
                       (js->clj response))))
 
@@ -175,8 +188,7 @@
 (reg-event-db
  :bad-response
  [trim-event]
- (fn-traced
-  [db [response]]
+ (fn [db [response]]
   (do
     (js/console.log "Badly handled: -> " response)
     db)))
@@ -185,7 +197,7 @@
 ;; Api response event handler
 (reg-event-fx
  :request-words
- (fn-traced [{db :db} [_ lang first-letter]]     ;; <-- 1st argument is coeffect, from which we extract db
+ (fn [{db :db} [_ lang first-letter]]     ;; <-- 1st argument is coeffect, from which we extract db
    ;; we return a map of (side) effects
    (let [sanitized-letter (sanitize-input first-letter)]
      {:http-xhrio {:method          :get
@@ -201,7 +213,10 @@
 
 
 (defn handle-search-input-entered
+  ;; {::g/trace 4}
   [{db :db} [_ letter]]
+  ;; [::db/db vector? | #(string? letter)
+   ;; => ::db/db]
   (if (and (= 1 (count letter))
            (not
             (some #(= letter %)
@@ -232,7 +247,7 @@
 
 (reg-event-db
  :show-grammar-card
- (fn-traced [db [_ show?]]
+ (fn [db [_ show?]]
    (assoc db :grammar-card-show? show?)))
 
 
@@ -255,12 +270,12 @@
   trim-event
   add-grammar-cards-to-db]
  ;;
- (fn-traced [db response] db))
+ (fn [db response] db))
 
 
 (reg-event-fx
  :request-grammar-cards
- (fn-traced [{:keys [db]} _]
+ (fn [{:keys [db]} _]
    ;; we return a map of (side) effects
    {:http-xhrio {:method          :get
                  :api (js/XMLHttpRequest.)
@@ -284,7 +299,7 @@
  ;; interceptors
  [show-grammar-card]
  ;;
- (fn-traced [db [_ id]]
+ (fn [db [_ id]]
    (assoc-in db [:cur-grammar-card-info]
              (get-in (->> (:grammar-cards db)
                           (filter #(= id (:id %)))
@@ -331,12 +346,12 @@
   trim-event
   add-basic-words-to-db]
  ;;
- (fn-traced [db response] db))
+ (fn [db response] db))
 
 
 (reg-event-fx
  :request-basic-words
- (fn-traced [{:keys [db]} _]
+ (fn [{:keys [db]} _]
    ;; we return a map of (side) effects
    {:http-xhrio {:method          :get
                  :api (js/XMLHttpRequest.)
@@ -353,7 +368,7 @@
  [check-spec-interceptor
   trim-event]
  ;;
- (fn-traced [db [letter]]
+ (fn [db [letter]]
    (assoc-in db [:basic-words-search-input] letter)))
 
 
@@ -363,7 +378,7 @@
  [check-spec-interceptor
   trim-event]
  ;;
- (fn-traced [db [flip? id]]
+ (fn [db [flip? id]]
    (assoc-in db
              [:basic-words]
              (map
@@ -380,7 +395,7 @@
  [check-spec-interceptor
   trim-event]
  ;;
- (fn-traced [db]
+ (fn [db]
    (assoc-in db
              [:basic-words]
              (map
@@ -394,7 +409,7 @@
  [check-spec-interceptor
   trim-event]
  ;;
- (fn-traced [db]
+ (fn [db]
    (assoc-in db
              [:basic-words]
              (map
@@ -402,4 +417,3 @@
               (get-in db [:basic-words])))))
 
 
-(g/check)

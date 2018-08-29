@@ -14,9 +14,10 @@
 
 ;; Helper
 
-(>defn ^::g/outstrument find-word
+(>defn find-word
        "Takes 'word' string and 'dict' vector of maps that should contain :word key with string.
        Returns list of maps with :word :la :comment keys"
+       ;; {::g/trace 4}
        [word dict lang]
        ;; spec-it
        [::db/word ::db/words string?
