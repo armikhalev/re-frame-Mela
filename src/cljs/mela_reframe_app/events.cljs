@@ -8,6 +8,7 @@
             [ajax.core :as ajax]
             [day8.re-frame.http-fx]
             [clojure.spec.alpha :as s]
+            [clojure.test.check.generators :as gen]
             [ghostwheel.core :as g
              :refer [>defn >defn- >fdef => | <- ?]]
             [cljs.pprint :as pp]
@@ -32,20 +33,46 @@
  (fn [_ _]
    db/default-db))
 
+(s/def :koyla-url/search-input string?)
+(s/def :koyla-url/cur-lang #{"Mela" "English"})
+(s/def :koyla-url/request-words keyword?)
+(s/def :koyla-url/first-letter (s/and string? #(= 1 (count %))))
 
-(defn handle-koyla-url-contains-searched-word
+(s/def :koyla-url/input (s/tuple
+                         keyword?
+                         #{"mela" "english"}
+                         :koyla-url/search-input))
+
+(s/def :event-handler/event vector?)
+(s/def :event-handler/db (s/keys :req-un [:event-handler/event ::db/db]))
+
+(s/def :koyla-url/dispatch (s/tuple
+                            :koyla-url/request-words
+                            #{"las" "words"}
+                            :koyla-url/first-letter))
+(s/def :koyla-url/set-cur-lang :koyla-url/cur-lang)
+(s/def :koyla-url/set-first-letters (s/tuple
+                                     :koyla-url/cur-lang
+                                     :koyla-url/first-letter))
+(s/def :koyla-url/return
+  (s/keys :req-un
+          [::db/db
+           :koyla-url/dispatch
+           :koyla-url/set-cur-lang
+           :koyla-url/set-first-letters]))
+
+(>defn handle-koyla-url-contains-searched-word
   "Event handler.
   Requires as args `db`,
   `lang` string, which either `mela` or `english`,
   `letter` string of any length.
   Requests api for Mela word if `lang` is `mela`, otherwise requests  English words.
   Sets first-letter of the `letter` to `first-letters` in `db` to the relevant language."
-
   ;; {::g/trace 4}
   [{db :db} [_ lang word]]
   ;; spec
-  ;; [::db/db vector? | #(string? lang)
-  ;;  => ::db/db]
+  [:event-handler/db :koyla-url/input | #(> (count word) 0)
+   => :koyla-url/return]
   ;;
   (let [first-letter (first word)
         cur-lang     (clojure.string/capitalize lang)
