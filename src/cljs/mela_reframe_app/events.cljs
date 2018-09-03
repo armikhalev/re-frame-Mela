@@ -33,6 +33,9 @@
  (fn [_ _]
    db/default-db))
 
+
+;; STARTS with specs for handle-koyla-url-contains-searched-word
+
 (s/def :koyla-url/search-input string?)
 (s/def :koyla-url/cur-lang #{"Mela" "English"})
 (s/def :koyla-url/request-words keyword?)
@@ -61,6 +64,7 @@
            :koyla-url/set-cur-lang
            :koyla-url/set-first-letters]))
 
+
 (>defn handle-koyla-url-contains-searched-word
   "Event handler.
   Requires as args `db`,
@@ -69,7 +73,7 @@
   Requests api for Mela word if `lang` is `mela`, otherwise requests  English words.
   Sets first-letter of the `letter` to `first-letters` in `db` to the relevant language."
   ;; {::g/trace 4}
-  [{db :db} [_ lang word]]
+  [{db :db} [_ lang word]]     ;; <-- 1st argument is coeffect, from which we extract db
   ;; spec
   [:event-handler/db :koyla-url/input | #(> (count word) 0)
    => :koyla-url/return]
@@ -85,11 +89,12 @@
      :set-cur-lang cur-lang
      :set-first-letters [cur-lang first-letter]}))
 
-;; (g/check)
 
 (reg-event-fx
  :koyla-url-contains-searched-word
  handle-koyla-url-contains-searched-word)
+
+;; ENDs koyla-url-contains-searched-word
 
 
 (reg-event-db
@@ -138,24 +143,35 @@
 ;; --> Starts: process-request-words-response
 
 
-(s/def :context/card (s/keys :req-un [::db/word ::db/la ::db/comment]))
+(s/def :context/card (s/keys :req-un [::db/word
+                                      ::db/la
+                                      ::db/comment]))
 (s/def :context/attributes :context/card)
 
 (s/def :context/relationships (s/keys :req-un [::db/grammar-card]))
 
-(s/def :context/word-card (s/keys :req-un [::db/id :context/attributes :context/relationships]))
+(s/def :context/word-card (s/keys :req-un [::db/id
+                                           :context/attributes
+                                           :context/relationships]))
 (s/def :context/data (s/coll-of :context/word-card))
+
 (s/def :context/effect (s/keys :req-un [:context/data]))
 (s/def :context/event (s/coll-of :context/effect))
-(s/def :context/coeffects (s/keys :req-un [:context/event ::db/db]))
+(s/def :context/coeffects (s/keys :req-un [:context/event
+                                           ::db/db]))
 (s/def :context/context (s/keys :req-un [:context/coeffects]))
 
-(s/def :response/handled-word-card (s/keys :req-un [::db/word ::db/la ::db/comment ::db/grammar-card ::db/id]))
+(s/def :response/handled-word-card (s/keys :req-un [::db/word
+                                                    ::db/la
+                                                    ::db/comment
+                                                    ::db/grammar-card
+                                                    ::db/id]))
 (s/def :response/handled-word-cards (s/coll-of :response/handled-word-card))
 
 (s/def :response/event (s/coll-of :response/handled-word-card))
 (s/def :response/coeffects (s/keys :req-un [:response/event]))
 (s/def :response/response (s/keys :req-un [:response/coeffects]))
+
 
 (>defn reduce-words-response
   "Helper fn used in :filter-words-response interceptor.
@@ -216,6 +232,7 @@
  :bad-response
  [trim-event]
  (fn [db [response]]
+   ;; TODO: create view that shows message that data was not loaded? Try reload page?
   (do
     (js/console.log "Badly handled: -> " response)
     db)))
@@ -224,7 +241,7 @@
 ;; Api response event handler
 (reg-event-fx
  :request-words
- (fn [{db :db} [_ lang first-letter]]     ;; <-- 1st argument is coeffect, from which we extract db
+ (fn [_ [_ lang first-letter]]
    ;; we return a map of (side) effects
    (let [sanitized-letter (sanitize-input first-letter)]
      {:http-xhrio {:method          :get
@@ -239,11 +256,18 @@
                    :on-failure      [:bad-response]}})))
 
 
-(defn handle-search-input-entered
+;; Starts handle-search-input-entered
+
+(s/def :search-input/update-url-with-current-koyla-search-input string?)
+(s/def :search-input-entered/return (s/keys  :req-un [::db/db
+                                                      :search-input/update-url-with-current-koyla-search-input]))
+
+;; TODO: should be tested with a unit test for `letter` = 1 and the opposite
+(>defn handle-search-input-entered
   ;; {::g/trace 4}
   [{db :db} [_ letter]]
-  ;; [::db/db vector? | #(string? letter)
-   ;; => ::db/db]
+  [:event-handler/db vector? | #(string? letter)
+   => :search-input-entered/return]
   (if (and (= 1 (count letter))
            (not
             (some #(= letter %)
@@ -268,6 +292,8 @@
  :search-input-entered
  handle-search-input-entered)
 
+;; ENDs handle-search-input-entered
+
 
 ;; GRAMMAR CARDS HANDLERS
 
@@ -278,16 +304,62 @@
    (assoc db :grammar-card-show? show?)))
 
 
+(s/def :add-grammar-cards/title string?)
+(s/def :add-grammar-cards/body string?)
+(s/def :add-grammar-cards/comment string?)
+
+;; Checks if category starts with an integer which app relies on in Textbook panel
+(s/def :add-grammar-cards/category (s/and
+                                    string?
+                                    #(int? (js/parseInt %))))
+
+(s/def :add-grammar-cards/attributes (s/keys :req-un [:add-grammar-cards/title
+                                                      :add-grammar-cards/body
+                                                      :add-grammar-cards/comment
+                                                      :add-grammar-cards/category]))
+(s/def :add-grammar-cards/id string?)
+(s/def :add-grammar-cards/type #{"GrammarCard"})
+
+(s/def :add-grammar-cards/grammar-card (s/keys :req-un [:add-grammar-cards/attributes
+                                                        :add-grammar-cards/id
+                                                        :add-grammar-cards/type]))
+
+(s/def :add-grammar-cards/data (s/coll-of :add-grammar-cards/grammar-card))
+(s/def :add-grammar-cards/effect (s/keys :req-un [:add-grammar-cards/data]))
+(s/def :add-grammar-cards/event (s/coll-of :add-grammar-cards/effect))
+(s/def :add-grammar-cards/coeffects (s/keys :req-un [:add-grammar-cards/event
+                                           ::db/db]))
+(s/def :add-grammar-cards/context (s/keys :req-un [:add-grammar-cards/coeffects]))
+
+(s/def :add-grammar-cards-return/grammar-cards (s/coll-of :add-grammar-cards/grammar-card))
+(s/def :add-grammar-cards-return/db (s/keys :req-un [::db/words
+                                                     ::db/basic-words
+                                                     ::db/show-menu?
+                                                     :add-grammar-cards-return/grammar-cards]))
+(s/def :add-grammar-cards-return/coeffects (s/keys :req-un [:add-grammar-cards/event
+                                                            :add-grammar-cards-return/db]))
+(s/def :add-grammar-cards/return (s/keys :req-un [:add-grammar-cards-return/coeffects]))
+
+(>defn before-add-grammar-cards-to-db
+       ;; {::g/trace 4}
+       [context]
+       ;; Spec
+       [:add-grammar-cards/context =>
+        :add-grammar-cards/return]
+       ;;
+       (let [response (-> context
+                          (get-in , [:coeffects :event])
+                          first
+                          :data)]
+         (assoc-in context [:coeffects :db :grammar-cards] (into [] response))))
+
+;; (g/check)
+
 ;; interceptor
 (def add-grammar-cards-to-db
   (re-frame.core/->interceptor
    :id     :add-grammar-cards-to-db
-   :before (fn [context]
-             (let [response (-> context
-                                (get-in , [:coeffects :event])
-                                first
-                                :data)]
-               (assoc-in context [:coeffects :db :grammar-cards] (into [] response))))))
+   :before before-add-grammar-cards-to-db))
 
 
 (reg-event-db
@@ -302,7 +374,7 @@
 
 (reg-event-fx
  :request-grammar-cards
- (fn [{:keys [db]} _]
+ (fn [_ _]
    ;; we return a map of (side) effects
    {:http-xhrio {:method          :get
                  :api (js/XMLHttpRequest.)
@@ -378,7 +450,7 @@
 
 (reg-event-fx
  :request-basic-words
- (fn [{:keys [db]} _]
+ (fn [_ _]
    ;; we return a map of (side) effects
    {:http-xhrio {:method          :get
                  :api (js/XMLHttpRequest.)
@@ -442,5 +514,6 @@
              (map
               #(update-in % [:attributes :flip] not)
               (get-in db [:basic-words])))))
+
 
 
