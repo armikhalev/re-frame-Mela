@@ -14,10 +14,8 @@
             [cljs.pprint :as pp]
             [re-frame.core :refer [reg-event-db reg-event-fx inject-cofx]]))
 
-
 ;; we create an interceptor using `after`
 (def check-spec-interceptor (re-frame/after (partial spec-it ::db/db)))
-
 
 ;; interceptor
 (def trim-event
@@ -27,19 +25,14 @@
               (let [trim-fn (fn [event] (-> event rest vec))]
                 (update-in context [:coeffects :event] trim-fn)))))
 
-
 (reg-event-db
  ::initialize-db
  (fn [_ _]
    db/default-db))
 
-
 ;; STARTS with specs for handle-koyla-url-contains-searched-word
 
 (s/def :koyla-url/search-input string?)
-(s/def :koyla-url/cur-lang #{"Mela" "English"})
-(s/def :koyla-url/request-words keyword?)
-(s/def :koyla-url/first-letter (s/and string? #(= 1 (count %))))
 
 (s/def :koyla-url/input (s/tuple
                          keyword?
@@ -48,6 +41,10 @@
 
 (s/def :event-handler/event vector?)
 (s/def :event-handler/db (s/keys :req-un [:event-handler/event ::db/db]))
+
+(s/def :koyla-url/cur-lang #{"Mela" "English"})
+(s/def :koyla-url/request-words keyword?)
+(s/def :koyla-url/first-letter (s/and string? #(= 1 (count %))))
 
 (s/def :koyla-url/dispatch (s/tuple
                             :koyla-url/request-words
@@ -63,7 +60,6 @@
            :koyla-url/dispatch
            :koyla-url/set-cur-lang
            :koyla-url/set-first-letters]))
-
 
 (>defn handle-koyla-url-contains-searched-word
   "Event handler.
@@ -89,7 +85,6 @@
      :set-cur-lang cur-lang
      :set-first-letters [cur-lang first-letter]}))
 
-
 (reg-event-fx
  :koyla-url-contains-searched-word
  handle-koyla-url-contains-searched-word)
@@ -102,7 +97,6 @@
  (fn [db [_ active-panel]]
    (assoc db :active-panel active-panel)))
 
-
 (>defn handle-set-show-menu
   [db [set-show-menu]]
   ;; spec
@@ -110,7 +104,6 @@
    => ::db/db]
   ;;
   (assoc db :show-menu? set-show-menu))
-
 
 (reg-event-db
  :set-show-menu
@@ -124,11 +117,10 @@
 
 
 (>defn handle-change-lang
-       [db [cur-lang]]
-       [::db/db vector? | #(string? cur-lang)
-        => ::db/db]
-       (assoc db :cur-lang cur-lang))
-
+  [db [cur-lang]]
+  [::db/db vector? | #(string? cur-lang)
+   => ::db/db]
+  (assoc db :cur-lang cur-lang))
 
 ;; Handle current language state
 (reg-event-db
@@ -141,7 +133,6 @@
 
 
 ;; --> Starts: process-request-words-response
-
 
 (s/def :context/card (s/keys :req-un [::db/word
                                       ::db/la
@@ -172,10 +163,10 @@
 (s/def :response/coeffects (s/keys :req-un [:response/event]))
 (s/def :response/response (s/keys :req-un [:response/coeffects]))
 
-
 (>defn reduce-words-response
   "Helper fn used in :filter-words-response interceptor.
    Adds `:id` and `:grammar-card` attributes to `:words`."
+  ;; {::g/trace 4}
   [response]
   [:context/data
    => :response/handled-word-cards]
@@ -190,7 +181,6 @@
           []
           response))
 
-
 (>defn before-filter-words-response-interceptor
   "Fn used in `:before` of `filter-words-response` interceptor"
   [context]
@@ -203,14 +193,12 @@
         words (set (get-in context [:coeffects :db :words]))]
     (assoc-in context [:coeffects :event] (into [] (clojure.set/union words response)))))
 
-
 ;; interceptor
 (def filter-words-response
   "Filter out data that is already present in db"
   (re-frame.core/->interceptor
    :id     :filter-words-response
    :before before-filter-words-response-interceptor))
-
 
 ;; Process response from 'request-words' event-fx
 (reg-event-db
@@ -221,9 +209,8 @@
   filter-words-response]
  ;; don't need to destructure response, since it is done in filter-words-response interceptor
  (fn [db response]
-            (assoc-in db [:words]
-                      (js->clj response))))
-
+   (assoc-in db [:words]
+             (js->clj response))))
 
 ;; <-- Ends: process-request-words-response
 
@@ -233,10 +220,9 @@
  [trim-event]
  (fn [db [response]]
    ;; TODO: create view that shows message that data was not loaded? Try reload page?
-  (do
-    (js/console.log "Badly handled: -> " response)
-    db)))
-
+   (do
+     (js/console.log "Badly handled: -> " response)
+     db)))
 
 ;; Api response event handler
 (reg-event-fx
@@ -287,7 +273,6 @@
     {:db (assoc-in db [:search-input] letter)
      :update-url-with-current-koyla-search-input letter}))
 
-
 (reg-event-fx
  :search-input-entered
  handle-search-input-entered)
@@ -304,72 +289,74 @@
    (assoc db :grammar-card-show? show?)))
 
 
-(s/def :add-grammar-cards/title string?)
-(s/def :add-grammar-cards/body string?)
-(s/def :add-grammar-cards/comment string?)
+;; STARTS process-request-grammar-cards-response
 
-;; Checks if category starts with an integer which app relies on in Textbook panel
-(s/def :add-grammar-cards/category (s/and
-                                    string?
-                                    #(int? (js/parseInt %))))
+;; Spec GrammarCard
 
-(s/def :add-grammar-cards/attributes (s/keys :req-un [:add-grammar-cards/title
-                                                      :add-grammar-cards/body
-                                                      :add-grammar-cards/comment
-                                                      :add-grammar-cards/category]))
-(s/def :add-grammar-cards/id string?)
-(s/def :add-grammar-cards/type #{"GrammarCard"})
+(s/def :grammar-cards/title string?)
+(s/def :grammar-cards/body string?)
+(s/def :grammar-cards/comment string?)
 
-(s/def :add-grammar-cards/grammar-card (s/keys :req-un [:add-grammar-cards/attributes
-                                                        :add-grammar-cards/id
-                                                        :add-grammar-cards/type]))
+(s/def :grammar-cards/category (s/and
+                                string?
+                                ;; Checks if category starts with an integer which app relies on in Textbook panel
+                                #(int? (js/parseInt %))))
 
-(s/def :add-grammar-cards/data (s/coll-of :add-grammar-cards/grammar-card))
-(s/def :add-grammar-cards/effect (s/keys :req-un [:add-grammar-cards/data]))
-(s/def :add-grammar-cards/event (s/coll-of :add-grammar-cards/effect))
-(s/def :add-grammar-cards/coeffects (s/keys :req-un [:add-grammar-cards/event
-                                           ::db/db]))
-(s/def :add-grammar-cards/context (s/keys :req-un [:add-grammar-cards/coeffects]))
+(s/def :grammar-cards/attributes (s/keys :req-un [:grammar-cards/title
+                                                  :grammar-cards/body
+                                                  :grammar-cards/comment
+                                                  :grammar-cards/category]))
+(s/def :grammar-cards/id string?)
+(s/def :grammar-cards/type #{"GrammarCard"})
 
-(s/def :add-grammar-cards-return/grammar-cards (s/coll-of :add-grammar-cards/grammar-card))
-(s/def :add-grammar-cards-return/db (s/keys :req-un [::db/words
-                                                     ::db/basic-words
-                                                     ::db/show-menu?
-                                                     :add-grammar-cards-return/grammar-cards]))
-(s/def :add-grammar-cards-return/coeffects (s/keys :req-un [:add-grammar-cards/event
-                                                            :add-grammar-cards-return/db]))
-(s/def :add-grammar-cards/return (s/keys :req-un [:add-grammar-cards-return/coeffects]))
+(s/def :grammar-cards/grammar-card (s/keys :req-un [:grammar-cards/attributes
+                                                    :grammar-cards/id
+                                                    :grammar-cards/type]))
 
-(>defn before-add-grammar-cards-to-db
+;; Spec input args of `process-request-grammar-cards-response-handler`
+
+;; db
+(s/def :grammar-cards-input/grammar-cards vector?)
+(s/def :grammar-cards-input/db (s/keys :req-un [::db/words
+                                                ::db/basic-words
+                                                ::db/show-menu?
+                                                :grammar-cards-input/grammar-cards]))
+
+;; response
+(s/def :grammar-cards-input/data (s/coll-of :grammar-cards/grammar-card))
+(s/def :grammar-cards-input/effect (s/keys :req-un [:grammar-cards-input/data]))
+(s/def :grammar-cards-input/response (s/coll-of :grammar-cards-input/effect))
+
+
+;; Spec return value of `process-request-grammar-cards-response-handler`
+
+(s/def :grammar-cards-return/grammar-cards (s/coll-of :grammar-cards/grammar-card))
+(s/def :grammar-cards-return/db (s/keys :req-un [::db/words
+                                                 ::db/basic-words
+                                                 ::db/show-menu?
+                                                 :grammar-cards-return/grammar-cards]))
+
+
+(>defn process-request-grammar-cards-response-handler
        ;; {::g/trace 4}
-       [context]
+       [db response]
        ;; Spec
-       [:add-grammar-cards/context =>
-        :add-grammar-cards/return]
+       [:grammar-cards-input/db :grammar-cards-input/response
+        => :grammar-cards-return/db]
        ;;
-       (let [response (-> context
-                          (get-in , [:coeffects :event])
-                          first
-                          :data)]
-         (assoc-in context [:coeffects :db :grammar-cards] (into [] response))))
-
-;; (g/check)
-
-;; interceptor
-(def add-grammar-cards-to-db
-  (re-frame.core/->interceptor
-   :id     :add-grammar-cards-to-db
-   :before before-add-grammar-cards-to-db))
-
+       (assoc-in db [:grammar-cards] (into [] (-> response
+                                                  first
+                                                  :data))))
 
 (reg-event-db
  :process-request-grammar-cards-response
  ;; interceptors
  [check-spec-interceptor
-  trim-event
-  add-grammar-cards-to-db]
+  trim-event]
  ;;
- (fn [db response] db))
+ process-request-grammar-cards-response-handler)
+
+;; ENDs process-request-grammar-cards-response
 
 
 (reg-event-fx
@@ -384,14 +371,12 @@
                  :on-success      [:process-request-grammar-cards-response]
                  :on-failure      [:bad-response]}}))
 
-
 ;; interceptor
 (def show-grammar-card
   (re-frame.core/->interceptor
    :id     :show-grammar-card
    :after (fn [context]
             (assoc-in context [:effects :db :grammar-card-show?] true))))
-
 
 (reg-event-db
  :grammar-card-info-clicked
@@ -404,7 +389,6 @@
                           (filter #(= id (:id %)))
                           first)
                      [:attributes]))))
-
 
 ;; LATAY
 
@@ -432,11 +416,8 @@
                                     (get-in d [:relationships :grammar-card :data])
                                     (if (contains? d :id) (:id d) false)
                                     (assoc data :grammar-card d)
-                                    (conj acc d))
-                                  )
-                                [] response)
-                               ))))))
-
+                                    (conj acc d)))
+                                [] response)))))))
 
 (reg-event-db
  :process-request-basic-words-response
@@ -446,7 +427,6 @@
   add-basic-words-to-db]
  ;;
  (fn [db response] db))
-
 
 (reg-event-fx
  :request-basic-words
@@ -460,7 +440,6 @@
                  :on-success      [:process-request-basic-words-response]
                  :on-failure      [:bad-response]}}))
 
-
 (reg-event-db
  :basic-words-search-input-entered
  ;; interceptors
@@ -469,7 +448,6 @@
  ;;
  (fn [db [letter]]
    (assoc-in db [:basic-words-search-input] letter)))
-
 
 (reg-event-db
  :flip-card
@@ -487,7 +465,6 @@
                   card*))
               (get-in db [:basic-words])))))
 
-
 (reg-event-db
  :flip-all-basic-words->front
  ;; interceptors
@@ -500,7 +477,6 @@
              (map
               #(update-in % [:attributes] assoc :flip false)
               (get-in db [:basic-words])))))
-
 
 (reg-event-db
  :flip--all-basic-words->opposite-side
@@ -515,5 +491,4 @@
               #(update-in % [:attributes :flip] not)
               (get-in db [:basic-words])))))
 
-
-
+;; (g/check)
