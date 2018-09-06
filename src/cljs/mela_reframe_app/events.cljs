@@ -411,40 +411,67 @@
 ;; LATAY
 
 
-;; interceptor
-(def add-basic-words-to-db
-  (re-frame.core/->interceptor
-   :id     :add-basic-words-to-db
-   :before (fn [context]
-             ;; get event data, it should contain :basic-words
-             (let [response (-> context
-                                (get-in , [:coeffects :event])
-                                first
-                                :data)]
+;; STARTs process-request-basic-words-response
 
-               ;; add more convenient way of getting grammar-card's id associated with a basic-word
-               (assoc-in context
-                         [:coeffects :db :basic-words]
-                         ;; :basic-words is vector but reduce returns list, 'into' turns it into vector
-                         (into []
-                               ;; iterate over :basic-words extracting id and putting it back with :grammar-card key
-                               (reduce
-                                (fn [acc data]
-                                  (as-> data d
-                                    (get-in d [:relationships :grammar-card :data])
-                                    (if (contains? d :id) (:id d) false)
-                                    (assoc data :grammar-card d)
-                                    (conj acc d)))
-                                [] response)))))))
+;; Spec process-request-basic-words-response-handler
+
+(s/def :process-request-basic-words/front string?)
+(s/def :process-request-basic-words/back string?)
+(s/def :process-request-basic-words/flip boolean?)
+
+(s/def :process-request-basic-words/attributes (s/keys :req-un
+                                                       [:process-request-basic-words/front
+                                                        :process-request-basic-words/back
+                                                        :process-request-basic-words/flip]))
+(s/def :process-request-basic-words/id (s/and
+                                        string?
+                                        #(int? (js/parseInt %))))
+(s/def :process-request-basic-words/type #{"Card"})
+
+;;
+(s/def :process-request-basic-words/basic-word (s/keys :req-un
+                                                       [:process-request-basic-words/attributes
+                                                        :context/relationships ;; <- grammar-card relationship
+                                                        :process-request-basic-words/id
+                                                        :process-request-basic-words/type]))
+(s/def :process-request-basic-words/data (s/coll-of :process-request-basic-words/basic-word))
+(s/def :process-request-basic-words/effect (s/keys :req-un [:process-request-basic-words/data]))
+(s/def :process-request-basic-words/response (s/coll-of :process-request-basic-words/effect))
+
+(>defn process-request-basic-words-response-handler
+  ;; {::g/trace 4}
+  [db response]
+  ;; Spec
+  [::db/db :process-request-basic-words/response |
+   #(-> db :basic-words count (= 0))
+   #(-> response first :data count (> 0))
+
+   => ::db/db |
+   #(-> % :basic-words count (> 0))] ;; return `db` should contain non-empty array of basic-words
+  ;;
+  (assoc-in db [:basic-words]
+            (let [basic-words (-> response first :data)]
+              (into []
+                    ;; iterate over :basic-words extracting id and putting it back with :grammar-card key
+                    (reduce
+                     (fn [acc data]
+                       (as-> data d
+                         (get-in d [:relationships :grammar-card :data])
+                         (if (contains? d :id) (:id d) false)
+                         (assoc data :grammar-card d)
+                         (conj acc d)))
+                     [] basic-words))) ))
 
 (reg-event-db
  :process-request-basic-words-response
  ;; interceptors
  [check-spec-interceptor
-  trim-event
-  add-basic-words-to-db]
+  trim-event]
  ;;
- (fn [db response] db))
+ process-request-basic-words-response-handler)
+
+;; ENDs process-request-basic-words-response
+
 
 (reg-event-fx
  :request-basic-words
