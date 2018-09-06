@@ -371,6 +371,7 @@
                  :on-success      [:process-request-grammar-cards-response]
                  :on-failure      [:bad-response]}}))
 
+
 ;; interceptor
 (def show-grammar-card
   (re-frame.core/->interceptor
@@ -378,17 +379,34 @@
    :after (fn [context]
             (assoc-in context [:effects :db :grammar-card-show?] true))))
 
+
+;; Spec `grammar-card-info-clicked-handler`
+
+(s/def :grammar-card-info-clicked/id (s/and
+                                     string?
+                                     #(int? (js/parseInt %))))
+(s/def :grammar-card-info-clicked/input (s/tuple
+                                        keyword?
+                                        :grammar-card-info-clicked/id))
+
+(>defn grammar-card-info-clicked-handler
+  ;; {::g/trace 4}
+  [db [_ id]]
+  [::db/db :grammar-card-info-clicked/input
+   => ::db/db]
+  (assoc-in db [:cur-grammar-card-info]
+            (get-in (->> (:grammar-cards db)
+                         (filter #(= id (:id %)))
+                         first)
+                    [:attributes])))
+
 (reg-event-db
  :grammar-card-info-clicked
  ;; interceptors
  [show-grammar-card]
  ;;
- (fn [db [_ id]]
-   (assoc-in db [:cur-grammar-card-info]
-             (get-in (->> (:grammar-cards db)
-                          (filter #(= id (:id %)))
-                          first)
-                     [:attributes]))))
+ grammar-card-info-clicked-handler)
+
 
 ;; LATAY
 
