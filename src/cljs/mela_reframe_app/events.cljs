@@ -443,11 +443,10 @@
   [db response]
   ;; Spec
   [::db/db :process-request-basic-words/response |
-   #(-> db :basic-words count (= 0))
-   #(-> response first :data count (> 0))
-
+    #(-> db :basic-words count (= 0))
+    #(-> response first :data count (> 0)) ;; `response` should contain non-empty array of basic-words
    => ::db/db |
-   #(-> % :basic-words count (> 0))] ;; return `db` should contain non-empty array of basic-words
+    #(-> % :basic-words count (> 0))] ;; return `db` should contain non-empty array of basic-words
   ;;
   (assoc-in db [:basic-words]
             (let [basic-words (-> response first :data)]
@@ -485,6 +484,7 @@
                  :on-success      [:process-request-basic-words-response]
                  :on-failure      [:bad-response]}}))
 
+
 (reg-event-db
  :basic-words-search-input-entered
  ;; interceptors
@@ -494,6 +494,7 @@
  (fn [db [letter]]
    (assoc-in db [:basic-words-search-input] letter)))
 
+
 (reg-event-db
  :flip-card
  ;; interceptors
@@ -501,14 +502,14 @@
   trim-event]
  ;;
  (fn [db [flip? id]]
-   (assoc-in db
-             [:basic-words]
+   (assoc-in db [:basic-words]
              (map
               (fn [card*]
                 (if (= id (get-in card* [:id]))
                   (update-in card* [:attributes :flip] not)
                   card*))
               (get-in db [:basic-words])))))
+
 
 (reg-event-db
  :flip-all-basic-words->front
@@ -522,6 +523,7 @@
              (map
               #(update-in % [:attributes] assoc :flip false)
               (get-in db [:basic-words])))))
+
 
 (reg-event-db
  :flip--all-basic-words->opposite-side

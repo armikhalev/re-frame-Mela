@@ -1,6 +1,10 @@
 (ns mela-reframe-app.db
+  #:ghostwheel.core{:check     true
+                    :num-tests 100}
   (:require [re-frame.core :as re-frame]
             [clojure.spec.alpha :as spec]
+            [ghostwheel.core :as g
+             :refer [>defn >defn- >fdef => | <- ?]]
             [accountant.core :as accountant]
             [mela-reframe-app.subs :as subs]
             [cljs.pprint :as pp]
@@ -92,29 +96,31 @@
    :basic-words-search-input  ""
    })
 
-;; Spec for below reg-fx :set-first-letters
-(spec/def ::arg1-set-first-letters
-  (spec/or
-   :English #(= "English" %)
-   :Mela #(= "Mela" %)))
 
-;; Effects
+;; EFFECTS
+
+(>defn set-first-letters-handler!
+  "Ensures that `db` is not overloaded by checking that words count is less than 1000
+  Watches count of `:first-letters` to prevent unnesassary calls to server
+  Empties `:words` and `:first-letters` if overloaded"
+
+  [[lang letter]] ;; destructure
+  ;; spec-it
+  [(spec/tuple #{"English" "Mela"} string?)
+   => ?]
+  ;;
+  (if (< (count @(re-frame/subscribe [::subs/words])) 1000 )
+    ;;true
+    (swap! re-frame.db/app-db update-in [:first-letters lang] conj letter)
+    ;;false
+    (do
+      (swap! re-frame.db/app-db update-in [:first-letters] empty)
+      (swap! re-frame.db/app-db update-in [:words] empty))))
+
+
 (re-frame/reg-fx
  :set-first-letters
- (fn [[lang letter]] ;; destructure
-   ;; spec-it
-   (spec-it ::arg1-set-first-letters lang)
-   ;;
-   "Ensures that db is not overloaded by checking that words count is less than 1000"
-   "Watches count of first-letters to prevent unnesassary calls to server"
-   "Empties words and first-letters if overloaded"
-   (if (< (count @(re-frame/subscribe [::subs/words])) 1000 )
-     ;;true
-     (swap! re-frame.db/app-db update-in [:first-letters lang] conj letter)
-     ;;false
-     (do
-       (swap! re-frame.db/app-db update-in [:first-letters] empty)
-       (swap! re-frame.db/app-db update-in [:words] empty)))))
+ set-first-letters-handler!)
 
 
 (re-frame/reg-fx
@@ -138,3 +144,5 @@
  :set-cur-lang
  (fn [lang]
    (swap! re-frame.db/app-db assoc :cur-lang lang)))
+
+;; (g/check)
