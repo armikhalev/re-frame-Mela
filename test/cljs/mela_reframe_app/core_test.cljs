@@ -1,6 +1,5 @@
 (ns mela-reframe-app.core-test
   (:require [cljs.test :refer-macros [deftest testing is]]
-            [mela-reframe-app.koyla-test :as koyla]
             [day8.re-frame.test :as rf-test]
             [re-frame.core :as rf]
             [mela-reframe-app.core :as core]
