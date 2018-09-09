@@ -25,6 +25,11 @@
    (:words db)))
 
 (reg-sub
+ ::grammar-cards
+ (fn [db _]
+   (:grammar-cards db)))
+
+(reg-sub
  ::cur-grammar-card-info
  (fn [db _]
    (:cur-grammar-card-info db)))

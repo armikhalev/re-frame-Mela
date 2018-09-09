@@ -487,6 +487,10 @@
 .textbook-card li:first-child {
   text-align: center; }
 
+.centered-text {
+    text-align: center;
+}
+
 .textbook-alphabet {
   position: relative;
   margin-left: auto;

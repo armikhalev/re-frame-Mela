@@ -3,6 +3,7 @@
             [accountant.core :as accountant]
             [mela-reframe-app.panels.koyla :refer [koyla-panel]]
             [mela-reframe-app.panels.latay :refer [latay-panel]]
+            [mela-reframe-app.panels.textbook :refer [textbook-panel]]
             [mela-reframe-app.subs :as subs :refer [<sub >dis]]
             [cljs.spec.alpha :as spec]
             [mela-reframe-app.dispatchers :as disps
@@ -21,15 +22,15 @@
   (let [name "Home"]
     [:div (str "Hello from " name ". This is the Home Page.")]))
 
-;; Textbook
-(defn textbook-panel []
-  [:div "This is the Textbook Page."])
 
 ;; main
 ;; Keep all impurity here, all other views should be pure functions
 (defn- panels [panel-name]
   (case panel-name
+
     :home-panel [home-panel]
+
+
     :latay-panel [latay-panel
                   >dis-basic-words-search-input-entered
                   (<sub [::subs/basic-words])
@@ -41,8 +42,9 @@
                   ;; grammar-cards
                   >dis-show-grammar-card
                   (<sub [::subs/cur-grammar-card-info])
-                  (<sub [::subs/grammar-card-show?])
-                  ]
+                  (<sub [::subs/grammar-card-show?])]
+
+
     :koyla-panel [koyla-panel
                   (<sub [::subs/words])
                   (<sub [::subs/search-input])
@@ -55,8 +57,14 @@
                   >dis-grammar-card-info-clicked
                   >dis-show-grammar-card
                   (<sub [::subs/grammar-card-show?])]
-    :textbook-panel [textbook-panel]
+
+
+    :textbook-panel [textbook-panel
+                     (<sub [::subs/grammar-cards])]
+
+
     [:div])) ;; <-- that div sholud be there
+
 
 (defn show-panel [panel-name]
   [:div.app
