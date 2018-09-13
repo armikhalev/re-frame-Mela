@@ -13,6 +13,30 @@
 
 ;; Helpers
 
+(defn flatten-cards
+  "Merges `id` and `attributes` of a map (in vector of maps) into one map"
+  [grammar-cards]
+  (reduce (fn [acc card]
+            (conj acc
+                  (merge
+                   {:id (:id card)}
+                   (:attributes card))))
+          [] grammar-cards))
+
+
+(defn group-by-category
+  "Takes vector of maps where maps have `:category` key.
+  Fn groups maps by category
+  creating new maps with two keys `:category` and `:grammar-cards`,
+  where having category and flattened data as values of corresponding keys.
+  NOTE: Depends on `flatten-cards` fn."
+  [grammar-cards]
+  (let [flat (flatten-cards grammar-cards)]
+    (for [[k v]
+          (group-by :category flat)]
+      {:category      k,
+       :grammar-cards v})))
+
 
 (>defn sanitize-input
   "Ensures that `input` string is alphanumeric, apostroph, dash or space.

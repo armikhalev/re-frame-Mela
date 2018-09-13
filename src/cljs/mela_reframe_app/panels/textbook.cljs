@@ -1,9 +1,23 @@
-(ns mela-reframe-app.panels.textbook)
+(ns mela-reframe-app.panels.textbook
+  #:ghostwheel.core{:check     true
+                    :num-tests 100}
+  (:require [re-frame.core :as re-frame]
+            [mela-reframe-app.db :as db]
+            [mela-reframe-app.common :as common :refer [flatten-cards
+                                                        group-by-category]]
+            [cljs.spec.alpha :as s]
+            [ghostwheel.core :as g
+             :refer [>defn >defn- >fdef => | <- ?]]
+            [cljs.pprint :as pp]
+            [mela-reframe-app.subs :as subs :refer [>dis]]))
 
+;; TEMP: should take data from db
 (def alphabet [{:letter "Aa", :name "a", :example "Spa"}
                {:letter "Dd", :name "da", :example "Do"}])
 
+
 ;; View
+
 
 (defn textbook-panel [grammar-cards]
   [:div
@@ -28,22 +42,28 @@
 
     ;; Textbook
    [:div.text-book
-    (for [g     (sort-by #(:category (:attributes %) ) grammar-cards)
-          :let [g-card   (:attributes g)
-                category (:category g-card)
-                title    (:title g-card)
-                body     (:body g-card)
-                comment  (:comment g-card)]]
+    (for [g (sort-by
+             :category
+             (group-by-category grammar-cards))
+          :let [category (:category g)]]
 
-      ^{:key (:id g)}
+      ^{:key category}
       [:div
        [:h2 {:id category}
         "Category: " category]
-       [:div.textbook-card
-        [:ul
-         [:li [:b title]]
-         [:li body]
-         [:li comment]]]])]
+
+       (for [g-card (:grammar-cards g)
+             :let [id       (:id g-card)
+                   title    (:title g-card)
+                   body     (:body g-card)
+                   comment  (:comment g-card)]]
+
+         ^{:key id}
+         [:div.textbook-card
+          [:ul
+           [:li [:b title]]
+           [:li body]
+           [:li comment]]])])]
    ])
 
 ;; {{slide-down-navbar titles=grammarCards}}
