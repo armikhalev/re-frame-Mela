@@ -13,9 +13,39 @@
 
 ;; Helpers
 
-(defn flatten-cards
+;; Specs
+(s/def ::title string?)
+(s/def ::body string?)
+(s/def ::comment string?)
+(s/def ::category ::db/str-is-int?)
+
+(s/def ::attributes (s/keys :req-un [::title
+                                     ::body
+                                     ::comment
+                                     ::category]))
+(s/def ::id ::db/str-is-int?)
+(s/def ::type #{"GrammarCard"})
+
+(s/def ::grammar-card (s/keys :req-un [::attributes
+                                       ::id
+                                       ::type]))
+(s/def ::grammar-cards (s/coll-of ::grammar-card))
+
+(s/def ::flattened-grammar-card (s/keys :req-un [::id ;; <- this is added
+                                                 ::title
+                                                 ::body
+                                                 ::comment
+                                                 ::category]))
+(s/def ::return (s/coll-of ::flattened-grammar-card))
+
+(>defn flatten-cards
   "Merges `id` and `attributes` of a map (in vector of maps) into one map"
+  ;; {::g/trace 4}
   [grammar-cards]
+  ;;
+  [::grammar-cards
+   => ::return]
+  ;;
   (reduce (fn [acc card]
             (conj acc
                   (merge
@@ -24,13 +54,23 @@
           [] grammar-cards))
 
 
-(defn group-by-category
+(s/def :flattened/grammar-cards (s/coll-of ::flattened-grammar-card))
+(s/def ::categorized-grammar-cards (s/keys :req-un [::category
+                                                    :flattened/grammar-cards]))
+(s/def ::group-by-category-output (s/coll-of ::categorized-grammar-cards))
+
+(>defn group-by-category
   "Takes vector of maps where maps have `:category` key.
   Fn groups maps by category
   creating new maps with two keys `:category` and `:grammar-cards`,
   where having category and flattened data as values of corresponding keys.
   NOTE: Depends on `flatten-cards` fn."
+  ;; {::g/trace 4}
   [grammar-cards]
+  ;;
+  [::grammar-cards
+   => ::group-by-category-output]
+  ;;
   (let [flat (flatten-cards grammar-cards)]
     (for [[k v]
           (group-by :category flat)]

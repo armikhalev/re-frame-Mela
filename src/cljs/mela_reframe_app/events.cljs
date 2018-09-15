@@ -297,10 +297,7 @@
 (s/def :grammar-cards/body string?)
 (s/def :grammar-cards/comment string?)
 
-(s/def :grammar-cards/category (s/and
-                                string?
-                                ;; Checks if category starts with an integer which app relies on in Textbook panel
-                                #(int? (js/parseInt %))))
+(s/def :grammar-cards/category ::db/str-is-int?)
 
 (s/def :grammar-cards/attributes (s/keys :req-un [:grammar-cards/title
                                                   :grammar-cards/body

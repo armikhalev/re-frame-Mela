@@ -50,6 +50,11 @@
 
 
 ;; Common
+(spec/def ::str-is-int? (spec/and
+                         string?
+                         ;; Checks if speced value though being string starts with integer
+                         #(int? (js/parseInt %))))
+
 (spec/def ::show-menu? boolean?)
 (spec/def ::db (spec/keys :req-un [::words ::basic-words ::show-menu?]))
 
