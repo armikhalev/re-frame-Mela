@@ -47,3 +47,9 @@
 (defn >dis-flip--all-basic-words->opposite-side
   []
   (>dis [:flip--all-basic-words->opposite-side]))
+
+;; Textbook
+
+(defn >dis-request-alphabets
+  []
+  (>dis [:request-alphabets]))

@@ -10,7 +10,8 @@
             [cljs.pprint :as pp]
 
             [mela-reframe-app.dispatchers :as disps
-             :refer [>dis-koyla-url-contains-searched-word]]))
+             :refer [>dis-koyla-url-contains-searched-word
+                     >dis-request-alphabets]]))
 
 
 (defn hook-browser-navigation! []
@@ -42,7 +43,8 @@
 
 
   (defroute "/textbook" []
-    (re-frame/dispatch [::events/set-active-panel :textbook-panel]))
+    (do (>dis-request-alphabets)
+        (re-frame/dispatch [::events/set-active-panel :textbook-panel])))
 
 
   ;; --------------------

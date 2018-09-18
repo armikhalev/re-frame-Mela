@@ -293,17 +293,13 @@
 
 ;; Spec GrammarCard
 
-(s/def :grammar-cards/title string?)
-(s/def :grammar-cards/body string?)
-(s/def :grammar-cards/comment string?)
-
 (s/def :grammar-cards/category ::db/str-is-int?)
 
-(s/def :grammar-cards/attributes (s/keys :req-un [:grammar-cards/title
-                                                  :grammar-cards/body
-                                                  :grammar-cards/comment
+(s/def :grammar-cards/attributes (s/keys :req-un [::db/title
+                                                  ::db/body
+                                                  ::db/comment
                                                   :grammar-cards/category]))
-(s/def :grammar-cards/id string?)
+(s/def :grammar-cards/id ::db/str-is-int?)
 (s/def :grammar-cards/type #{"GrammarCard"})
 
 (s/def :grammar-cards/grammar-card (s/keys :req-un [:grammar-cards/attributes
@@ -534,5 +530,46 @@
              (map
               #(update-in % [:attributes :flip] not)
               (get-in db [:basic-words])))))
+
+
+;; Alphabets
+
+(>defn process-request-request-alphabets
+  "Event handler saves Alphabets data to `db` in consumable flat format."
+  {::g/trace 4}
+  [db response]
+  ;; Spec
+  [? ? => ?]
+  ;;
+  (assoc-in db [:alphabets]
+            (let [ r (first response ) ] ;; <- destructure
+              (->> r
+                   (:data)
+                   (reduce
+                    (fn [acc d]
+                      (conj acc (:attributes d)))
+                          [] , )))))
+
+
+(reg-event-db
+ :process-request-alphabets
+ ;; interceptors
+ [trim-event]
+ ;;
+ process-request-request-alphabets)
+
+
+(reg-event-fx
+ :request-alphabets
+ (fn [_ _]
+   ;; we return a map of (side) effects
+   {:http-xhrio {:method          :get
+                 :api (js/XMLHttpRequest.)
+                 :headers {"Accept" "application/vnd.api+json"}
+                 :uri             "http://melasi.pythonanywhere.com/koyla/alphabets"
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [:process-request-alphabets]
+                 :on-failure      [:bad-response]}}))
+
 
 ;; (g/check)

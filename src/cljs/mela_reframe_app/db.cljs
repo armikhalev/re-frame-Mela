@@ -12,10 +12,17 @@
 
 ;; SPECS
 
+;; Util specs
 
-(spec/def ::id string?)
+(spec/def ::str-is-int? (spec/and
+                         string?
+                         ;; Checks if speced value though being string starts with integer
+                         #(int? (js/parseInt %))))
+
 
 ;; Grammar cards
+
+(spec/def ::id string?)
 (spec/def ::type string?)
 (spec/def ::data (spec/nilable (spec/keys :opt-un [::type ::id])))
 
@@ -50,10 +57,6 @@
 
 
 ;; Common
-(spec/def ::str-is-int? (spec/and
-                         string?
-                         ;; Checks if speced value though being string starts with integer
-                         #(int? (js/parseInt %))))
 
 (spec/def ::show-menu? boolean?)
 (spec/def ::db (spec/keys :req-un [::words ::basic-words ::show-menu?]))
@@ -99,6 +102,10 @@
    :basic-words               []
 
    :basic-words-search-input  ""
+
+   ;; Textbook page
+
+   :alphabets                 []
    })
 
 

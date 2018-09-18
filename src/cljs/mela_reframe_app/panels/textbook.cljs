@@ -11,15 +11,10 @@
             [cljs.pprint :as pp]
             [mela-reframe-app.subs :as subs :refer [>dis]]))
 
-;; TEMP: should take data from db
-(def alphabet [{:letter "Aa", :name "a", :example "Spa"}
-               {:letter "Dd", :name "da", :example "Do"}])
-
-
 ;; View
 
-
-(defn textbook-panel [grammar-cards]
+(defn textbook-panel [alphabet
+                      grammar-cards]
   [:div
 
    ;; Alphabet table

@@ -60,6 +60,7 @@
 
 
     :textbook-panel [textbook-panel
+                     (<sub [::subs/alphabets])
                      (<sub [::subs/grammar-cards])]
 
 
