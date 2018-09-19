@@ -29,6 +29,7 @@
     [:tbody
      (for [{:keys [letter name example]}
            alphabet]
+
        ^{:key letter}
        [:tr
         [:td letter]

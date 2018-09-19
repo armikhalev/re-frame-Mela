@@ -499,9 +499,14 @@
     border-collapse: collapse;
     overflow-x: auto;
     width: 100%; }
-  .textbook-alphabet th, .textbook-alphabet td {
-    text-align: center;
-    padding: 8px; }
+  .textbook-alphabet thead {
+      background-color: wheat;
+  }
+  .textbook-alphabet th,
+  .textbook-alphabet td,
+  .textbook-alphabet thead {
+      text-align: center;
+      padding: 8px; }
   .textbook-alphabet tr:nth-child(odd) {
     background-color: rgba(187, 195, 155, 0.3); }
 
@@ -614,4 +619,3 @@
   user-select: none;
   -moz-user-select: none; }
 
-/*# sourceMappingURL=melasi-frontend-ember.css.map */

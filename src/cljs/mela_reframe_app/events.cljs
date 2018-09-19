@@ -534,12 +534,42 @@
 
 ;; Alphabets
 
+(s/def :alphabets/letter          string?)
+(s/def :alphabets/name            string?)
+(s/def :alphabets/example         string?)
+
+(s/def :alphabets/type            #{"Alphabet"})
+(s/def :alphabets/id              ::db/str-is-int?)
+(s/def :alphabets/attributes      (s/keys :req-un [:alphabets/letter
+                                                   :alphabets/name
+                                                   :alphabets/example]))
+
+(s/def :alphabets/letter-data     (s/keys :req-un [:alphabets/type
+                                                   :alphabets/id
+                                                   :alphabets/attributes]))
+(s/def :alphabets/data            (s/coll-of :alphabets/letter-data))
+(s/def :alphabets/event           (s/keys :req-un [:alphabets/data]))
+(s/def :alphabets/response        (s/coll-of :alphabets/event))
+
+(s/def :alphabets/alphabets       (s/and empty? vector?))
+
+(s/def :alphabets/empty-db-with-alphabets
+                                  (s/keys :req-un [:alphabets/alphabets]))
+(s/def :alphabets/db              (s/merge ::db/db :alphabets/empty-db-with-alphabets))
+
+(s/def :alphabets-response/alphabets
+                                  (s/coll-of :alphabets/attributes))
+(s/def :alphabets-response/db-with-alphabets
+                                  (s/keys :req-un [:alphabets-response/alphabets]))
+(s/def :alphabets-response/output (s/merge ::db/db :alphabets-response/db-with-alphabets))
+
 (>defn process-request-request-alphabets
   "Event handler saves Alphabets data to `db` in consumable flat format."
-  {::g/trace 4}
+  ;; {::g/trace 4}
   [db response]
   ;; Spec
-  [? ? => ?]
+  [:alphabets/db :alphabets/response
+   => :alphabets-response/output]
   ;;
   (assoc-in db [:alphabets]
             (let [ r (first response ) ] ;; <- destructure
