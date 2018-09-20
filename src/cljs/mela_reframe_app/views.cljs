@@ -15,7 +15,8 @@
                      >dis-set-show-menu
                      >dis-flip-all-basic-words->front
                      >dis-flip--all-basic-words->opposite-side
-                     >dis-flip-card]]))
+                     >dis-flip-card
+                     >dis-categories-nav-touched]]))
 
 ;; home
 (defn home-panel []
@@ -61,7 +62,9 @@
 
     :textbook-panel [textbook-panel
                      (<sub [::subs/alphabets])
-                     (<sub [::subs/grammar-cards])]
+                     (<sub [::subs/grammar-cards])
+                     (<sub [::subs/categories-nav-touched?])
+                     >dis-categories-nav-touched]
 
 
     [:div])) ;; <-- that div sholud be there

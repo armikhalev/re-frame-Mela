@@ -563,7 +563,7 @@
                                   (s/keys :req-un [:alphabets-response/alphabets]))
 (s/def :alphabets-response/output (s/merge ::db/db :alphabets-response/db-with-alphabets))
 
-(>defn process-request-request-alphabets
+(>defn process-request-alphabets
   "Event handler saves Alphabets data to `db` in consumable flat format."
   ;; {::g/trace 4}
   [db response]
@@ -578,7 +578,7 @@
                    (reduce
                     (fn [acc d]
                       (conj acc (:attributes d)))
-                          [] , )))))
+                    [] , )))))
 
 
 (reg-event-db
@@ -586,7 +586,7 @@
  ;; interceptors
  [trim-event]
  ;;
- process-request-request-alphabets)
+ process-request-alphabets)
 
 
 (reg-event-fx
@@ -601,5 +601,14 @@
                  :on-success      [:process-request-alphabets]
                  :on-failure      [:bad-response]}}))
 
+
+
+(reg-event-db
+ :categories-nav-touched
+ ;; interceptors
+ [trim-event]
+ ;;
+ (fn [db [set-nav-touched]]
+   (assoc db :categories-nav-touched? set-nav-touched)))
 
 ;; (g/check)

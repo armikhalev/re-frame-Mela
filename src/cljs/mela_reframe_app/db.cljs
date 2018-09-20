@@ -106,6 +106,8 @@
    ;; Textbook page
 
    :alphabets                 []
+
+   :categories-nav-touched?   false
    })
 
 

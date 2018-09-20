@@ -53,3 +53,7 @@
 (defn >dis-request-alphabets
   []
   (>dis [:request-alphabets]))
+
+(defn >dis-categories-nav-touched
+  [touched?]
+  (>dis [:categories-nav-touched touched?]))

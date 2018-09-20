@@ -81,3 +81,8 @@
  ::alphabets
  (fn [db _]
    (:alphabets db)))
+
+(reg-sub
+ ::categories-nav-touched?
+ (fn [db _]
+   (:categories-nav-touched? db)))

@@ -3,6 +3,7 @@
                     :num-tests 100}
   (:require [re-frame.core :as re-frame]
             [mela-reframe-app.db :as db]
+            [secretary.core :as secretary]
             [mela-reframe-app.common :as common :refer [flatten-cards
                                                         group-by-category]]
             [cljs.spec.alpha :as s]
@@ -13,8 +14,12 @@
 
 ;; View
 
+
 (defn textbook-panel [alphabet
-                      grammar-cards]
+                      grammar-cards
+                      categories-nav-touched?
+                      >dis-categories-nav-touched]
+
   [:div
 
    ;; Alphabet table
@@ -37,6 +42,7 @@
         [:td example]])]]
 
     ;; Textbook
+
    [:div.text-book
     (for [g (sort-by
              :category
@@ -60,6 +66,18 @@
            [:li [:b title]]
            [:li body]
            [:li comment]]])])]
-   ])
 
-;; {{slide-down-navbar titles=grammarCards}}
+   ;; slide-down-navbar
+
+   (let [categories (map :category (group-by-category grammar-cards))]
+
+     [:div.slide-down-navbar
+      {:class (when categories-nav-touched? "touch")
+       :on-click #(>dis-categories-nav-touched (not categories-nav-touched?))}
+      [:div.slide-down-btn "Select category"]
+      (for [cat categories]
+        ^{:key cat}
+        [:a
+         {:href (str "#" cat)}
+         cat])])])
+
