@@ -108,6 +108,8 @@
    :alphabets                 []
 
    :categories-nav-touched?   false
+
+   :category-el              nil
    })
 
 
@@ -158,5 +160,11 @@
  :set-cur-lang
  (fn [lang]
    (swap! re-frame.db/app-db assoc :cur-lang lang)))
+
+
+(re-frame/reg-fx
+ :scroll-to-category
+ (fn [cat-el]
+   (.scrollIntoView cat-el true)))
 
 ;; (g/check)

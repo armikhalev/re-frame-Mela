@@ -611,4 +611,12 @@
  (fn [db [set-nav-touched]]
    (assoc db :categories-nav-touched? set-nav-touched)))
 
+
+(reg-event-fx
+ :set-category-el
+ ;;
+ (fn [{db :db} [_ category-el]]
+   {:db (assoc-in db [:category-el] category-el)
+    :scroll-to-category category-el}))
+
 ;; (g/check)

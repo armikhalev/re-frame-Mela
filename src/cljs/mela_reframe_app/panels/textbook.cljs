@@ -12,13 +12,18 @@
             [cljs.pprint :as pp]
             [mela-reframe-app.subs :as subs :refer [>dis]]))
 
+(defn get-el-by-id [el]
+  (. js/document (getElementById el)))
+
 ;; View
 
 
 (defn textbook-panel [alphabet
                       grammar-cards
                       categories-nav-touched?
-                      >dis-categories-nav-touched]
+                      category-el
+                      >dis-categories-nav-touched
+                      >dis-set-category-el]
 
   [:div
 
@@ -51,7 +56,8 @@
 
       ^{:key category}
       [:div
-       [:h2 {:id category}
+       {:id (first category)}
+       [:h2
         "Category: " category]
 
        (for [g-card (:grammar-cards g)
@@ -75,9 +81,9 @@
       {:class (when categories-nav-touched? "touch")
        :on-click #(>dis-categories-nav-touched (not categories-nav-touched?))}
       [:div.slide-down-btn "Select category"]
-      (for [cat categories]
+      (for [cat (sort categories)]
         ^{:key cat}
         [:a
-         {:href (str "#" cat)}
+         {:on-click #(>dis-set-category-el (get-el-by-id (first cat)))}
          cat])])])
 

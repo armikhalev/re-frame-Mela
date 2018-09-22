@@ -16,6 +16,7 @@
                      >dis-flip-all-basic-words->front
                      >dis-flip--all-basic-words->opposite-side
                      >dis-flip-card
+                     >dis-set-category-el
                      >dis-categories-nav-touched]]))
 
 ;; home
@@ -64,7 +65,9 @@
                      (<sub [::subs/alphabets])
                      (<sub [::subs/grammar-cards])
                      (<sub [::subs/categories-nav-touched?])
-                     >dis-categories-nav-touched]
+                     (<sub [::subs/category-el])
+                     >dis-categories-nav-touched
+                     >dis-set-category-el]
 
 
     [:div])) ;; <-- that div sholud be there

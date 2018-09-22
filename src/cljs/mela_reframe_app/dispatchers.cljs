@@ -57,3 +57,7 @@
 (defn >dis-categories-nav-touched
   [touched?]
   (>dis [:categories-nav-touched touched?]))
+
+(defn >dis-set-category-el
+  [category-el]
+  (>dis [:set-category-el category-el]))

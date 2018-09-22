@@ -13,7 +13,6 @@
              :refer [>dis-koyla-url-contains-searched-word
                      >dis-request-alphabets]]))
 
-;; (secretary/set-config! :prefix "#")
 
 (defn hook-browser-navigation! []
   (doto (Html5History.)

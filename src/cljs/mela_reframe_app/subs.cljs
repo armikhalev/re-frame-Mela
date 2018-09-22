@@ -86,3 +86,8 @@
  ::categories-nav-touched?
  (fn [db _]
    (:categories-nav-touched? db)))
+
+(reg-sub
+ ::category-el
+ (fn [db _]
+   (:category-el db)))
