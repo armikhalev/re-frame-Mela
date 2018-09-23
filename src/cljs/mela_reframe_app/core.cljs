@@ -25,6 +25,7 @@
   (re-frame/dispatch [:request-words "words" "a"])
   (re-frame/dispatch [:request-grammar-cards])
   (re-frame/dispatch [:request-basic-words])
+  (re-frame/dispatch [:request-intros])
   (dev-setup)
   (mount-root))
 

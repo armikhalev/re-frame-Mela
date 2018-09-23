@@ -3,6 +3,7 @@
             [accountant.core :as accountant]
             [mela-reframe-app.panels.koyla :refer [koyla-panel]]
             [mela-reframe-app.panels.latay :refer [latay-panel]]
+            [mela-reframe-app.panels.home :refer [home-panel]]
             [mela-reframe-app.panels.textbook :refer [textbook-panel]]
             [mela-reframe-app.subs :as subs :refer [<sub >dis]]
             [cljs.spec.alpha :as spec]
@@ -19,18 +20,14 @@
                      >dis-set-category-el
                      >dis-categories-nav-touched]]))
 
-;; home
-(defn home-panel []
-  (let [name "Home"]
-    [:div (str "Hello from " name ". This is the Home Page.")]))
+;; Main
 
-
-;; main
 ;; Keep all impurity here, all other views should be pure functions
 (defn- panels [panel-name]
   (case panel-name
 
-    :home-panel [home-panel]
+    :home-panel [home-panel
+                 (<sub [::subs/intros])]
 
 
     :latay-panel [latay-panel

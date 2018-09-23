@@ -109,7 +109,12 @@
 
    :categories-nav-touched?   false
 
-   :category-el              nil
+   :category-el               nil
+
+   ;; Home page
+
+   :intros                    {:title ""
+                               :body ""}
    })
 
 

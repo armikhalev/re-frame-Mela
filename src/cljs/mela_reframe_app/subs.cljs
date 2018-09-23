@@ -91,3 +91,8 @@
  ::category-el
  (fn [db _]
    (:category-el db)))
+
+(reg-sub
+ ::intros
+ (fn [db _]
+   (:intros db)))

@@ -61,3 +61,7 @@
 (defn >dis-set-category-el
   [category-el]
   (>dis [:set-category-el category-el]))
+
+(defn >dis-process-request-intros
+  []
+  (>dis [:process-request-intros]))

@@ -619,4 +619,39 @@
    {:db (assoc-in db [:category-el] category-el)
     :scroll-to-category category-el}))
 
+
+;; Home page
+
+
+(defn process-request-intros
+  "Fn gets `data` with `attributes` containing `body` and `title` for Home page and saves it to `db`"
+  [db response]
+  (assoc-in db [:intros]
+            (let [r (first response)]
+              (->> r
+                   (:data)
+                   first
+                   (:attributes)))))
+
+
+(reg-event-db
+ :process-request-intros
+ ;; interceptors
+ [trim-event]
+ ;;
+ process-request-intros)
+
+
+(reg-event-fx
+ :request-intros
+ (fn [_ _]
+   ;; we return a map of (side) effects
+   {:http-xhrio {:method          :get
+                 :api (js/XMLHttpRequest.)
+                 :headers {"Accept" "application/vnd.api+json"}
+                 :uri             "http://melasi.pythonanywhere.com/koyla/intros/"
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [:process-request-intros]
+                 :on-failure      [:bad-response]}}))
+
 ;; (g/check)
