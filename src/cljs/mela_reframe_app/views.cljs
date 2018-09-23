@@ -93,13 +93,12 @@
           ;;
           (for [pl page-links]
             ^{:key (str (:href pl)"-"(:title pl)"-"panel-name)}
-            [:li
-             [:a
-              {:href (:href pl)
-               :on-click (do
-                              #(accountant/navigate! pl)
-                              #(>dis-set-show-menu false))}
-              (:title pl)]]))]]]
+            [:a
+             {:href (:href pl)
+              :on-click (do
+                          #(accountant/navigate! pl)
+                          #(>dis-set-show-menu false))}
+             [:li (:title pl)]]))]]]
    ;;
    [:main.main-container
     {:on-click #(>dis-set-show-menu false)}
