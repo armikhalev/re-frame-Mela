@@ -129,7 +129,7 @@
          {:placeholder placeholder
           :auto-focus true
           :value search-input
-          :on-change #(>dis-search-input-entered (sanitize-input (-> % .-target .-value)))}])})))
+          :on-change #(>dis-search-input-entered (.toLowerCase (sanitize-input (-> % .-target .-value))))}])})))
 
 
 (>defn text-book-comp
